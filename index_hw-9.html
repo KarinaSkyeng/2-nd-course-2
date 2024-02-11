@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Проект "Комменты"</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="styles_hw-9.css"/>
+  </head>
+
+  <body>
+    <div class="container">
+      <ul class="comments">
+        <li class="comment">
+          <div class="comment-header">
+            <div>Глеб Фокин</div>
+            <div>12.02.22 12:18</div>
+          </div>
+          <div class="comment-body">
+            <div class="comment-text">
+              Это будет первый комментарий на этой странице
+            </div>
+          </div>
+          <div class="comment-footer">
+            <div class="likes">
+              <span class="likes-counter">3</span>
+              <button class="like-button"></button>
+            </div>
+          </div>
+        </li>
+        <li class="comment">
+          <div class="comment-header">
+            <div>Варвара Н.</div>
+            <div>13.02.22 19:22</div>
+          </div>
+          <div class="comment-body">
+            <div class="comment-text">
+              Мне нравится как оформлена эта страница! ❤
+            </div>
+          </div>
+          <div class="comment-footer">
+            <div class="likes">
+              <span class="likes-counter">75</span>
+              <button class="like-button -active-like"></button>
+            </div>
+          </div>
+        </li>
+      </ul>
+      <div class="add-form">
+        <input
+          type="text"
+          class="add-form-name"
+          placeholder="Введите ваше имя"
+        />
+        <textarea
+          type="textarea"
+          class="add-form-text"
+          placeholder="Введите ваш коментарий"
+          rows="4"
+        ></textarea>
+        <div class="add-form-row">
+          <button class="add-form-button">Написать</button>
+        </div>
+      </div>
+    </div>
+  </body>
+
+  <script>
+    "use strict";
+    // Код писать здесь
+
+    // Найти элементы формы
+    const nameElement = document.querySelector(".add-form-name");
+    const textElement = document.querySelector(".add-form-text");
+    const buttonElement = document.querySelector(".add-form-button");
+    const commentsList = document.querySelector(".comments");
+
+    // Функция для добавления комментария
+    function addComment() {
+      // Получить значения из полей ввода
+      const name = nameElement.value.trim();
+      const text = textElement.value.trim();
+
+      // Проверить, что поля не пустые
+      if (!name || !text) {
+        highlightEmptyFields();
+        return;
+      }
+
+      // Создать элементы комментария
+      const comment = document.createElement("li");
+      comment.classList.add("comment");
+      comment.innerHTML = `
+    <div class="comment-header">
+      <div>${name}</div>
+      <div>${getCurrentDateTime()}</div>
+    </div>
+    <div class="comment-body">
+      <div class="comment-text">${text}</div>
+    </div>
+    <div class="comment-footer">
+      <div class="likes">
+        <span class="likes-counter">0</span>
+        <button class="like-button"></button>
+      </div>
+    </div>
+  `;
+
+      // Добавить комментарий к списку
+      commentsList.appendChild(comment);
+
+      // Очистить поля ввода
+      nameElement.value = "";
+      textElement.value = "";
+    }
+
+    // Функция для подсветки пустых полей
+    function highlightEmptyFields() {
+      if (!nameElement.value.trim()) {
+        nameElement.classList.add("error");
+      } else {
+        nameElement.classList.remove("error");
+      }
+      if (!textElement.value.trim()) {
+        textElement.classList.add("error");
+      } else {
+        textElement.classList.remove("error");
+      }
+    }
+
+    // Обработчик события для кнопки "Написать"
+    buttonElement.addEventListener("click", addComment);
+
+    // Функция для получения текущей даты и времени
+    function getCurrentDateTime() {
+      const options = {
+        day: "2-digit",
+        month: "2-digit",
+        year: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      };
+      return new Date().toLocaleString("ru-RU", options).replace(",", "");
+    }
+    console.log("It works!");
+  </script>
+</html>
