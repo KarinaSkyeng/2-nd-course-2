@@ -141,5 +141,25 @@
       return new Date().toLocaleString("ru-RU", options).replace(",", "");
     }
     console.log("It works!");
+
+    const likeButtons = document.querySelectorAll(".like-button");
+    const likeCounters = document.querySelectorAll(".likes-counter");
+
+    function updateLikesState(likeButton, likeCounter) {
+      const isActive = likeButton.classList.contains("-active-like");
+
+      const currentCount = parseInt(likeCounter.textContent);
+      likeCounter.textContent = isActive ? currentCount - 1 : currentCount + 1;
+
+      likeButton.classList.toggle("-active-like");
+
+      likeButtons.forEach((likeButton, index) => {
+        likeButton.addEventListener("click", () => {
+          const likeCounter = likeCounters[index];
+
+          updateLikeState(likeButton, likeCounter);
+        });
+      });
+    }
   </script>
 </html>
