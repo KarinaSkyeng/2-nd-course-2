@@ -3,7 +3,7 @@
   <head>
     <title>Проект "Комменты"</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="styles_hw-9.css"/>
+    <link rel="stylesheet" href="styles_hw-9.css" />
   </head>
 
   <body>
@@ -73,6 +73,22 @@
     const buttonElement = document.querySelector(".add-form-button");
     const commentsList = document.querySelector(".comments");
 
+    // Массив данных комментариев
+    const comments = [
+  {
+    name: "Глеб Фокин",
+    date: "12.02.22 12:18",
+    text: "Это будет первый комментарий на этой странице",
+    liked: false, // добавленное свойство для отслеживания состояния лайка
+  },
+  {
+    name: "Варвара Н.",
+    date: "13.02.22 19:22",
+    text: "Мне нравится как оформлена эта страница! ❤",
+    liked: true, // добавленное свойство для отслеживания состояния лайка
+  },
+];
+
     // Функция для добавления комментария
     function addComment() {
       // Получить значения из полей ввода
@@ -85,32 +101,42 @@
         return;
       }
 
-      // Создать элементы комментария
-      const comment = document.createElement("li");
-      comment.classList.add("comment");
-      comment.innerHTML = `
-    <div class="comment-header">
-      <div>${name}</div>
-      <div>${getCurrentDateTime()}</div>
-    </div>
-    <div class="comment-body">
-      <div class="comment-text">${text}</div>
-    </div>
-    <div class="comment-footer">
-      <div class="likes">
-        <span class="likes-counter">0</span>
-        <button class="like-button"></button>
-      </div>
-    </div>
-  `;
+      // Создать объект нового комментария
+  const newComment = {
+    name: name,
+    date: getCurrentDateTime(),
+    text: text,
+    liked: false // Новый комментарий изначально не лайкнут
+  };
 
-      // Добавить комментарий к списку
-      commentsList.appendChild(comment);
+  // Добавить новый комментарий в массив
+  comments.push(newComment);
+
+  // Перерисовать все комментарии
+  renderComments();
 
       // Очистить поля ввода
       nameElement.value = "";
       textElement.value = "";
     }
+
+    // Функция для отрисовки всех комментариев
+function renderComments() {
+  // Очистить список комментариев перед перерисовкой
+  commentsList.innerHTML = "";
+
+  // Проход по всем комментариям в массиве comments
+  comments.forEach(comment => {
+    // Создание элемента комментария
+    const commentElement = createCommentElement(comment.name, comment.text, comment.date);
+
+    // Добавление элемента комментария в список
+    commentsList.appendChild(commentElement);
+  });
+
+  // Назначение обработчиков событий для кнопок лайка
+  initLikeButtonsListeners();
+}
 
     // Функция для подсветки пустых полей
     function highlightEmptyFields() {
@@ -129,6 +155,29 @@
     // Обработчик события для кнопки "Написать"
     buttonElement.addEventListener("click", addComment);
 
+    // Функция для создания элемента комментария
+    function createCommentElement(name, text) {
+      const comment = document.createElement("li");
+      comment.classList.add("comment");
+      comment.innerHTML = `
+        <div class="comment-header">
+          <div>${name}</div>
+          <div>${getCurrentDateTime()}</div>
+        </div>
+        <div class="comment-body">
+          <div class="comment-text">${text}</div>
+        </div>
+        <div class="comment-footer">
+          <div class="likes">
+            <span class="likes-counter">0</span>
+            <button class="like-button"></button>
+          </div>
+        </div>
+      `;
+
+      return comment;
+    }
+
     // Функция для получения текущей даты и времени
     function getCurrentDateTime() {
       const options = {
@@ -142,24 +191,32 @@
     }
     console.log("It works!");
 
-    const likeButtons = document.querySelectorAll(".like-button");
-    const likeCounters = document.querySelectorAll(".likes-counter");
+    // Назначение обработчиков событий для кнопок лайка
+    initLikeButtonsListeners();
 
-    function updateLikesState(likeButton, likeCounter) {
-      const isActive = likeButton.classList.contains("-active-like");
-
-      const currentCount = parseInt(likeCounter.textContent);
-      likeCounter.textContent = isActive ? currentCount - 1 : currentCount + 1;
-
-      likeButton.classList.toggle("-active-like");
-
-      likeButtons.forEach((likeButton, index) => {
+    // Функция для назначения обработчиков событий для кнопок лайка
+    function initLikeButtonsListeners() {
+      const likeButtons = document.querySelectorAll(".like-button");
+      likeButtons.forEach((likeButton) => {
         likeButton.addEventListener("click", () => {
-          const likeCounter = likeCounters[index];
-
-          updateLikeState(likeButton, likeCounter);
+          updateLikesState(likeButton);
         });
       });
+    }
+
+    // Функция для обновления состояния лайка
+    function updateLikesState(likeButton) {
+      const isActive = likeButton.classList.contains("-active-like");
+      const likeCounter = likeButton.previousElementSibling;
+      const currentCount = parseInt(likeCounter.textContent);
+
+      if (isActive) {
+        likeCounter.textContent = currentCount - 1;
+      } else {
+        likeCounter.textContent = currentCount + 1;
+      }
+
+      likeButton.classList.toggle("-active-like");
     }
   </script>
 </html>
