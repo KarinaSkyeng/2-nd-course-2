@@ -42,32 +42,40 @@
     return htmlString.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
   }
 
-  // Обработчик события клика на комментарий
+// Обработчик события клика на комментарий
 commentsList.addEventListener("click", function(event) {
-  const commentElement = event.target.closest(".comment"); 
-  if (!commentElement) return;
-  const name = commentElement.querySelector(".comment-header div:first-child").textContent; 
-  const text = commentElement.querySelector(".comment-text").textContent; 
+  const clickedElement = event.target;
 
-  // Подставляем имя и текст комментария в форму добавления комментария
-  nameElement.value = name;
-  textElement.value = `@${name}, ${text}`;
+  // Проверяем, что клик был на комментарии или на одном из его дочерних элементов
+  const commentElement = clickedElement.closest(".comment");
+  if (commentElement) {
+    // Проверяем, что клик не был на кнопке лайка
+    if (!clickedElement.classList.contains("like-button")) {
+      const name = commentElement.querySelector(".comment-header div:first-child").textContent; 
+      const text = commentElement.querySelector(".comment-text").textContent; 
+
+      // Подставляем имя и текст комментария в форму добавления комментария
+      nameElement.value = name;
+      textElement.value = `@${name}, ${text}`; 
+    }
+  }
 });
+
     // Массив данных комментариев
     const comments = [
       {
         name: "Глеб Фокин",
         date: "12.02.22 12:18",
         text: "Это будет первый комментарий на этой странице",
-        likes: 3, // Изначальное количество лайков
-        liked: false, // добавленное свойство для отслеживания состояния лайка
+        likes: 3, 
+        liked: false, 
       },
       {
         name: "Варвара Н.",
         date: "13.02.22 19:22",
         text: "Мне нравится как оформлена эта страница! ❤",
-        likes: 75, // Изначальное количество лайков
-        liked: true, // добавленное свойство для отслеживания состояния лайка
+        likes: 75, 
+        liked: true, 
       },
     ];
 
@@ -90,7 +98,7 @@ commentsList.addEventListener("click", function(event) {
     };  
 
       comments.push(newComment);
-      
+
       renderComments();
 
       nameElement.value = "";
