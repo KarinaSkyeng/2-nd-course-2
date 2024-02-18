@@ -3,46 +3,13 @@
   <head>
     <title>Проект "Комменты"</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="styles_hw-9.css"/>
+    <link rel="stylesheet" href="styles_hw-9.css" />
   </head>
 
   <body>
     <div class="container">
       <ul class="comments">
-        <li class="comment">
-          <div class="comment-header">
-            <div>Глеб Фокин</div>
-            <div>12.02.22 12:18</div>
-          </div>
-          <div class="comment-body">
-            <div class="comment-text">
-              Это будет первый комментарий на этой странице
-            </div>
-          </div>
-          <div class="comment-footer">
-            <div class="likes">
-              <span class="likes-counter">3</span>
-              <button class="like-button"></button>
-            </div>
-          </div>
-        </li>
-        <li class="comment">
-          <div class="comment-header">
-            <div>Варвара Н.</div>
-            <div>13.02.22 19:22</div>
-          </div>
-          <div class="comment-body">
-            <div class="comment-text">
-              Мне нравится как оформлена эта страница! ❤
-            </div>
-          </div>
-          <div class="comment-footer">
-            <div class="likes">
-              <span class="likes-counter">75</span>
-              <button class="like-button -active-like"></button>
-            </div>
-          </div>
-        </li>
+        <!-- Комментарии -->
       </ul>
       <div class="add-form">
         <input
@@ -53,7 +20,7 @@
         <textarea
           type="textarea"
           class="add-form-text"
-          placeholder="Введите ваш коментарий"
+          placeholder="Введите ваш комментарий"
           rows="4"
         ></textarea>
         <div class="add-form-row">
@@ -65,51 +32,136 @@
 
   <script>
     "use strict";
-    // Код писать здесь
-
     // Найти элементы формы
     const nameElement = document.querySelector(".add-form-name");
     const textElement = document.querySelector(".add-form-text");
     const buttonElement = document.querySelector(".add-form-button");
     const commentsList = document.querySelector(".comments");
 
+    // Массив данных комментариев
+    const comments = [
+      {
+        name: "Глеб Фокин",
+        date: "12.02.22 12:18",
+        text: "Это будет первый комментарий на этой странице",
+        likes: 3, // Изначальное количество лайков
+        liked: false, // добавленное свойство для отслеживания состояния лайка
+      },
+      {
+        name: "Варвара Н.",
+        date: "13.02.22 19:22",
+        text: "Мне нравится как оформлена эта страница! ❤",
+        likes: 75, // Изначальное количество лайков
+        liked: true, // добавленное свойство для отслеживания состояния лайка
+      },
+    ];
+
     // Функция для добавления комментария
     function addComment() {
-      // Получить значения из полей ввода
       const name = nameElement.value.trim();
       const text = textElement.value.trim();
 
-      // Проверить, что поля не пустые
       if (!name || !text) {
         highlightEmptyFields();
         return;
       }
 
-      // Создать элементы комментария
-      const comment = document.createElement("li");
-      comment.classList.add("comment");
-      comment.innerHTML = `
-    <div class="comment-header">
-      <div>${name}</div>
-      <div>${getCurrentDateTime()}</div>
-    </div>
-    <div class="comment-body">
-      <div class="comment-text">${text}</div>
-    </div>
-    <div class="comment-footer">
-      <div class="likes">
-        <span class="likes-counter">0</span>
-        <button class="like-button"></button>
-      </div>
-    </div>
-  `;
+      const newComment = {
+        name: name,
+        date: getCurrentDateTime(),
+        text: text,
+        liked: false,
+        likes: 0,
+      };
 
-      // Добавить комментарий к списку
-      commentsList.appendChild(comment);
+      comments.push(newComment);
+      renderComments();
 
-      // Очистить поля ввода
       nameElement.value = "";
       textElement.value = "";
+
+      nameElement.classList.remove("error");
+      textElement.classList.remove("error");
+    }
+
+    // Обработчик события для кнопки "Написать"
+    buttonElement.addEventListener("click", addComment);
+
+    // Функция для отрисовки всех комментариев
+    function renderComments() {
+      commentsList.innerHTML = "";
+
+      comments.forEach((comment, index) => {
+        const commentElement = createCommentElement(
+          comment.name,
+          comment.text,
+          comment.date,
+          comment.likes,
+          comment.liked
+        );
+
+        commentsList.appendChild(commentElement);
+
+        const likeButton = commentElement.querySelector(".like-button");
+        likeButton.dataset.commentIndex = index;
+
+        likeButton.addEventListener("click", () => {
+          updateLikesState(likeButton, index);
+        });
+      });
+    }
+
+    // Функция для обновления состояния лайка
+    function updateLikesState(likeButton, commentIndex) {
+      const comment = comments[commentIndex];
+
+      comment.liked = !comment.liked;
+
+      if (comment.liked) {
+        comment.likes++;
+      } else {
+        comment.likes--;
+      }
+
+      renderComments();
+    }
+
+    // Функция для создания элемента комментария
+    function createCommentElement(name, text, date, likes, liked) {
+      const comment = document.createElement("li");
+      comment.classList.add("comment");
+
+      const commentHTML = `
+        <div class="comment-header">
+          <div>${name}</div>
+          <div>${date}</div>
+        </div>
+        <div class="comment-body">
+          <div class="comment-text">${text}</div>
+        </div>
+        <div class="comment-footer">
+          <div class="likes">
+            <span class="likes-counter">${likes}</span>
+            <button class="like-button ${liked ? '-active-like' : ''}"></button>
+          </div>
+        </div>
+      `;
+
+      comment.innerHTML = commentHTML;
+
+      return comment;
+    }
+
+    // Функция для получения текущей даты и времени
+    function getCurrentDateTime() {
+      const options = {
+        day: "2-digit",
+        month: "2-digit",
+        year: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      };
+      return new Date().toLocaleString("ru-RU", options).replace(",", "");
     }
 
     // Функция для подсветки пустых полей
@@ -126,20 +178,7 @@
       }
     }
 
-    // Обработчик события для кнопки "Написать"
-    buttonElement.addEventListener("click", addComment);
-
-    // Функция для получения текущей даты и времени
-    function getCurrentDateTime() {
-      const options = {
-        day: "2-digit",
-        month: "2-digit",
-        year: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-      };
-      return new Date().toLocaleString("ru-RU", options).replace(",", "");
-    }
-    console.log("It works!");
+    // Инициализация начального рендера комментариев
+    renderComments();
   </script>
 </html>
