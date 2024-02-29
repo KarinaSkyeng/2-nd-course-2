@@ -32,178 +32,177 @@
 
   <script>
     "use strict";
-    // Найти элементы формы
-    const nameElement = document.querySelector(".add-form-name");
-    const textElement = document.querySelector(".add-form-text");
-    const buttonElement = document.querySelector(".add-form-button");
-    const commentsList = document.querySelector(".comments");
-
-    const sanitizeHtml = (htmlString) => {
-    return htmlString.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
-  }
-
-  
-// Обработчик события клика на комментарий
-commentsList.addEventListener("click", function(event) {
-  const clickedElement = event.target;
-
-  // Проверяем, что клик был на комментарии или на одном из его дочерних элементов
-  const commentElement = clickedElement.closest(".comment");
-  if (commentElement) {
-    // Проверяем, что клик не был на кнопке лайка
-    if (!clickedElement.classList.contains("like-button")) {
-      const name = commentElement.querySelector(".comment-header div:first-child").textContent; 
-      const text = commentElement.querySelector(".comment-text").textContent; 
-
-      // Подставляем имя и текст комментария в форму добавления комментария
-      nameElement.value = name;
-      textElement.value = `@${name}, ${text}`; 
-    }
-  }
+    document.addEventListener("DOMContentLoaded", () => {
+  loadCommentsFromAPI();
 });
 
-    // Массив данных комментариев
-    const comments = [
-      {
-        name: "Глеб Фокин",
-        date: "12.02.22 12:18",
-        text: "Это будет первый комментарий на этой странице",
-        likes: 3, 
-        liked: false, 
-      },
-      {
-        name: "Варвара Н.",
-        date: "13.02.22 19:22",
-        text: "Мне нравится как оформлена эта страница! ❤",
-        likes: 75, 
-        liked: true, 
-      },
-    ];
+// Найти элементы формы
+const nameElement = document.querySelector(".add-form-name");
+const textElement = document.querySelector(".add-form-text");
+const buttonElement = document.querySelector(".add-form-button");
+const commentsList = document.querySelector(".comments");
 
-    // Функция для добавления комментария
-    function addComment() {
-      const name = nameElement.value.trim();
-      const text = textElement.value.trim();
+// Функция для загрузки списка комментариев из API
+function loadCommentsFromAPI() {
+  fetch("https://wedev-api.sky.pro/api/v1/karina-skyeng/comments")
+    .then((response) => response.json())
+    .then((data) => {
+      // Обновляем отображение комментариев на странице
+      renderComments(data.comments);
+    })
+    .catch((error) => {
+      console.error("Ошибка при загрузке комментариев:", error);
+    });
+}
 
-      if (!name || !text) {
-        highlightEmptyFields();
-        return;
+// Функция для добавления комментария в список и обновления отображения
+function addComment() {
+  const name = nameElement.value.trim();
+  const text = textElement.value.trim();
+
+  if (!name || !text) {
+    highlightEmptyFields();
+    return;
+  }
+
+  const newComment = {
+    name: name,
+    text: text,
+  };
+
+  const options = {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(newComment),
+  };
+
+  fetch("https://wedev-api.sky.pro/api/v1/karina-skyeng/comments", options)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Ошибка при добавлении комментария");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      loadCommentsFromAPI();
+    })
+    .catch((error) => {
+      console.error("Ошибка при добавлении комментария:", error);
+    });
+}
+
+// Обработчик события для кнопки "Написать"
+buttonElement.addEventListener("click", addComment);
+
+// Функция для отрисовки всех комментариев
+function renderComments(comments) {
+  commentsList.innerHTML = "";
+
+  comments.forEach((comment, index) => {
+    const commentElement = createCommentElement(
+      comment.author.name,
+      comment.text,
+      comment.date,
+      comment.likes,
+      comment.liked
+    );
+
+    commentsList.appendChild(commentElement);
+
+    const likeButton = commentElement.querySelector(".like-button");
+    likeButton.dataset.commentIndex = index;
+
+    likeButton.addEventListener("click", () => {
+      updateLikesState(likeButton, index);
+    });
+  });
+}
+
+
+      // Функция для обновления состояния лайка
+      function updateLikesState(likeButton, commentIndex) {
+        const comment = comments[commentIndex];
+
+        comment.liked = !comment.liked;
+
+        if (comment.liked) {
+          comment.likes++;
+        } else {
+          comment.likes--;
+        }
+
+        renderComments(comments);
       }
 
-      const newComment = {
-        name: nameElement.value.replace(/</g, "&lt;").replace(/>/g, "&gt;"),
-        date: getCurrentDateTime(),
-        text: textElement.value.replace(/</g, "&lt;").replace(/>/g, "&gt;"),
-        liked: false,
-        likes: 0
-    };  
+      // Функция для создания элемента комментария
+      function createCommentElement(name, text, date, likes, liked) {
+        const comment = document.createElement("li");
+        comment.classList.add("comment");
 
-      comments.push(newComment);
-
-      renderComments();
-
-      nameElement.value = "";
-      textElement.value = "";
-
-      nameElement.classList.remove("error");
-      textElement.classList.remove("error");
-    }
-
-    // Обработчик события для кнопки "Написать"
-    buttonElement.addEventListener("click", addComment);
-
-    // Функция для отрисовки всех комментариев
-    function renderComments() {
-      commentsList.innerHTML = "";
-
-      comments.forEach((comment, index) => {
-        const commentElement = createCommentElement(
-          comment.name,
-          comment.text,
-          comment.date,
-          comment.likes,
-          comment.liked
-        );
-
-        commentsList.appendChild(commentElement);
-
-        const likeButton = commentElement.querySelector(".like-button");
-        likeButton.dataset.commentIndex = index;
-
-        likeButton.addEventListener("click", () => {
-          updateLikesState(likeButton, index);
-        });
-      });
-    }
-
-    // Функция для обновления состояния лайка
-    function updateLikesState(likeButton, commentIndex) {
-      const comment = comments[commentIndex];
-
-      comment.liked = !comment.liked;
-
-      if (comment.liked) {
-        comment.likes++;
-      } else {
-        comment.likes--;
-      }
-
-      renderComments();
-    }
-
-    // Функция для создания элемента комментария
-    function createCommentElement(name, text, date, likes, liked) {
-      const comment = document.createElement("li");
-      comment.classList.add("comment");
-
-      const commentHTML = `
-        <div class="comment-header">
-          <div>${name}</div>
-          <div>${date}</div>
-        </div>
-        <div class="comment-body">
-          <div class="comment-text">${text}</div>
-        </div>
-        <div class="comment-footer">
-          <div class="likes">
-            <span class="likes-counter">${likes}</span>
-            <button class="like-button ${liked ? '-active-like' : ''}"></button>
+        const commentHTML = `
+          <div class="comment-header">
+            <div>${name}</div>
+            <div>${date}</div>
           </div>
-        </div>
-      `;
+          <div class="comment-body">
+            <div class="comment-text">${text}</div>
+          </div>
+          <div class="comment-footer">
+            <div class="likes">
+              <span class="likes-counter">${likes}</span>
+              <button class="like-button ${liked ? "-active-like" : ""}"></button>
+            </div>
+          </div>
+        `;
 
-      comment.innerHTML = commentHTML;
+        comment.innerHTML = commentHTML;
 
-      return comment;
-    }
+        return comment;
+      }
 
-    // Функция для получения текущей даты и времени
-    function getCurrentDateTime() {
-      const options = {
-        day: "2-digit",
-        month: "2-digit",
-        year: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-      };
-      return new Date().toLocaleString("ru-RU", options).replace(",", "");
-    }
+      // Функция для подсветки пустых полей
+      function highlightEmptyFields() {
+        if (!nameElement.value.trim()) {
+          nameElement.classList.add("error");
+        } else {
+          nameElement.classList.remove("error");
+        }
+        if (!textElement.value.trim()) {
+          textElement.classList.add("error");
+        } else {
+          textElement.classList.remove("error");
+        }
+      }
 
-    // Функция для подсветки пустых полей
-    function highlightEmptyFields() {
-      if (!nameElement.value.trim()) {
-        nameElement.classList.add("error");
-      } else {
+      // Обработчик события для кнопки "Написать"
+      buttonElement.addEventListener("click", () => {
+        const name = nameElement.value.trim();
+        const text = textElement.value.trim();
+
+        if (!name || !text) {
+          highlightEmptyFields();
+          return;
+        }
+
+        // Очищаем поля формы
+        nameElement.value = "";
+        textElement.value = "";
+
+        // Убираем подсветку пустых полей
         nameElement.classList.remove("error");
-      }
-      if (!textElement.value.trim()) {
-        textElement.classList.add("error");
-      } else {
         textElement.classList.remove("error");
-      }
-    }
+      });
 
-    // Инициализация начального рендера комментариев
-    renderComments();
+      // Функция для получения текущей даты и времени
+      function getCurrentDateTime() {
+        const options = {
+          day: "2-digit",
+          month: "2-digit",
+          year: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+        };
+        return new Date().toLocaleString("ru-RU", options).replace(",", "");
+      }
   </script>
 </html>
