@@ -44,7 +44,7 @@ const commentsList = document.querySelector(".comments");
 
 // Функция для загрузки списка комментариев из API
 function loadCommentsFromAPI() {
-  fetch("https://wedev-api.sky.pro/api/v1/karina-skyeng/comments")
+  fetch("https://wedev-api.sky.pro/api/v1/karina-korneva/comments")
     .then((response) => response.json())
     .then((data) => {
       // Обновляем отображение комментариев на странице
@@ -71,12 +71,11 @@ function addComment() {
   };
 
   const options = {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method: "POST",    
     body: JSON.stringify(newComment),
   };
 
-  fetch("https://wedev-api.sky.pro/api/v1/karina-skyeng/comments", options)
+  fetch("https://wedev-api.sky.pro/api/v1/karina-korneva/comments", options)
     .then((response) => {
       if (!response.ok) {
         throw new Error("Ошибка при добавлении комментария");
@@ -113,14 +112,13 @@ function renderComments(comments) {
     likeButton.dataset.commentIndex = index;
 
     likeButton.addEventListener("click", () => {
-      updateLikesState(likeButton, index);
+      updateLikesState(likeButton, index, comments);
     });
   });
 }
 
-
-      // Функция для обновления состояния лайка
-      function updateLikesState(likeButton, commentIndex) {
+// Функция для обновления состояния лайка
+      function updateLikesState(likeButton, commentIndex, comments) {
         const comment = comments[commentIndex];
 
         comment.liked = !comment.liked;
