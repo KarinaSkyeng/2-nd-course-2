@@ -52,30 +52,33 @@
     const commentsList = document.querySelector(".comments");
 
     // Функция для загрузки списка комментариев из API
-    function loadCommentsFromAPI() {
-        // Показываем сообщение о загрузке
-        document.getElementById("loading-message").style.display = "block";
+function loadCommentsFromAPI() {
+    // Показываем сообщение о загрузке
+    document.getElementById("loading-message").style.display = "block";
 
-        fetch("https://wedev-api.sky.pro/api/v1/karina-korneva/comments")
-            .then((response) => response.json())
-            .then((data) => {             
-                // Скрываем сообщение о загрузке после загрузки комментариев
-                document.getElementById("loading-message").style.display = "none";
+    fetch("https://wedev-api.sky.pro/api/v1/karina-korneva/comments")
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error("Ошибка при загрузке комментариев");
+            }
+            return response.json();
+        })
+        .then((data) => {
+            // Скрываем сообщение о загрузке после загрузки комментариев
+            document.getElementById("loading-message").style.display = "none";
 
-                // Обновляем отображение комментариев на странице
-                renderComments(data.comments);
-            })
-            .catch((error) => {
-                console.error("Ошибка при загрузке комментариев:", error);
-               // Обработка ошибок 500-го уровня
-                if (error.status === 500) {
-                    console.log(error)
-                    alert("Сервер сломался, попробуй позже");
-                }               
-                // Скрываем сообщение о загрузке в случае ошибки
-                document.getElementById("loading-message").style.display = "none";
-            });
-    }
+            // Обновляем отображение комментариев на странице
+            renderComments(data.comments);
+        })
+        .catch((error) => {
+            console.error("Ошибка при загрузке комментариев:", error);
+            // Обработка ошибок 500-го уровня
+            alert("Сервер сломался, попробуй позже");
+
+            // Скрываем сообщение о загрузке в случае ошибки
+            document.getElementById("loading-message").style.display = "none";
+        });
+}
 
 function toggleAddingCommentMessage(show) {
   const addingCommentMessage = document.getElementById("adding-comment-message");
