@@ -32,17 +32,17 @@
 </div>
 
 <script>
-  "use strict";
-  document.addEventListener("DOMContentLoaded", () => {
-      loadCommentsFromAPI();
-  });
+    "use strict";
+    document.addEventListener("DOMContentLoaded", () => {
+        loadCommentsFromAPI();
+    });
 
-  const sanitizeHtml = (htmlString) => {
-      return htmlString.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
-  };
-
-  // Переменные для сохранения введенных данных
-  let enteredName = "";
+    const sanitizeHtml = (htmlString) => {
+        return htmlString.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+    };
+   
+    // Переменные для сохранения введенных данных
+    let enteredName = "";
     let enteredText = "";
 
     // Найти элементы формы
@@ -52,56 +52,70 @@
     const commentsList = document.querySelector(".comments");
 
     // Функция для загрузки списка комментариев из API
-function loadCommentsFromAPI() {
-    // Показываем сообщение о загрузке
-    document.getElementById("loading-message").style.display = "block";
+    function loadCommentsFromAPI() {
+        // Показываем сообщение о загрузке
+        document.getElementById("loading-message").style.display = "block";
 
-    fetch("https://wedev-api.sky.pro/api/v1/karina-korneva/comments")
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error("Ошибка при загрузке комментариев");
+        fetch("https://wedev-api.sky.pro/api/v1/karina-korneva/comments")
+            .then((response) => {
+                if (!response.ok) {
+                    if (response.status === 500) {
+                        throw new Error("Ошибка 500: Внутренняя ошибка сервера");
+                    } else {
+                        throw new Error("Ошибка при добавлении комментария");
+                    }
+                }
+                return response.json();
+            })
+            .then((data) => {             
+                // Скрываем сообщение о загрузке после загрузки комментариев
+                document.getElementById("loading-message").style.display = "none";
+
+                // Обновляем отображение комментариев на странице
+                renderComments(data.comments);
+            })
+            .catch((error) => {
+                console.error("Ошибка при добавлении комментария:", error);
+                // Обработка ошибок
+                if (error && error.message === "Ошибка при загрузке комментариев") {
+                    console.log("Ошибка 500:", error.message);
+                    alert("Не удалось загрузить комментарии.");
+                } else if (error && error.message === "Ошибка 500: Внутренняя ошибка сервера") {
+                    alert("Произошла ошибка при загрузке комментариев.");
+                }  else {
+                    alert("Сервер сломался, попробуйте позже.");
+            } 
+
+                // Скрываем сообщение о загрузке в случае ошибки
+                document.getElementById("loading-message").style.display = "none";
+
+                // Отображаем заглушку
+                document.querySelector(".comments").innerHTML = "<li>Не удалось загрузить комментарии</li>";
+            });
+    }
+
+    function toggleAddingCommentMessage(show) {
+        const addingCommentMessage = document.getElementById("adding-comment-message");
+        const addButton = document.querySelector(".add-form-button");
+
+            if (show) {
+                addingCommentMessage.style.display = "block";
+                addButton.style.display = "none";
+            } else {
+                addingCommentMessage.style.display = "none";
+                addButton.style.display = "block";
             }
-            return response.json();
-        })
-        .then((data) => {
-            // Скрываем сообщение о загрузке после загрузки комментариев
-            document.getElementById("loading-message").style.display = "none";
-
-            // Обновляем отображение комментариев на странице
-            renderComments(data.comments);
-        })
-        .catch((error) => {
-            console.error("Ошибка при загрузке комментариев:", error);
-            // Обработка ошибок 500-го уровня
-            alert("Сервер сломался, попробуй позже");
-
-            // Скрываем сообщение о загрузке в случае ошибки
-            document.getElementById("loading-message").style.display = "none";
-        });
-}
-
-function toggleAddingCommentMessage(show) {
-  const addingCommentMessage = document.getElementById("adding-comment-message");
-  const addButton = document.querySelector(".add-form-button");
-
-  if (show) {
-    addingCommentMessage.style.display = "block";
-    addButton.style.display = "none";
-  } else {
-    addingCommentMessage.style.display = "none";
-    addButton.style.display = "block";
-  }
-}
+    }
 
     // Функция для добавления комментария в список и обновления отображения
     function addComment() {
         const name = nameElement.value.trim();
         const text = textElement.value.trim();
 
-        if (!name || !text) {
-            highlightEmptyFields();
-            return;
-        }
+            if (!name || !text) {
+                highlightEmptyFields();
+                return;
+            }
 
         // Сохраняем введенные данные
         enteredName = name;
@@ -109,7 +123,7 @@ function toggleAddingCommentMessage(show) {
 
         toggleAddingCommentMessage(true);
 
-            const newComment = {
+        const newComment = {
             name: name,
             text: text,
         };
@@ -128,20 +142,21 @@ function toggleAddingCommentMessage(show) {
                 }
                 return response.json();
             })
-            .catch((error) => {
-            console.error("Ошибка при добавлении комментария:", error);
-            // Обработка ошибок 400-го уровня
-            if (error && error.message === "Ошибка при добавлении комментария") {
-                console.log("Ошибка 400:", error.message);
-                alert("Имя и комментарий должны содержать не менее 3 символов.");
-            }
-        })
             .then((data) => {
                 nameElement.value = "";
                 textElement.value = "";
                 // Загружаем комментарии после успешного добавления
                 loadCommentsFromAPI();                                               
-            })            
+            }) 
+            .catch((error) => {
+                console.error("Ошибка при добавлении комментария:", error);
+                // Обработка ошибок 400-го уровня
+                if (error && error.message === "Ошибка при добавлении комментария") {
+                    console.log("Ошибка 400:", error.message);
+                    alert("Имя и комментарий должны содержать не менее 3 символов.");
+                }
+            })
+                       
             .finally(() => {
                 toggleAddingCommentMessage(false); // Скрываем сообщение о добавлении комментария
             });
@@ -197,11 +212,11 @@ function toggleAddingCommentMessage(show) {
 
         const commentHTML = `
           <div class="comment-header">
-            <div>${name}</div>
+            <div>${sanitizeHtml(name)}</div>
             <div>${formattedDate}</div>
           </div>
           <div class="comment-body">
-            <div class="comment-text">${text}</div>
+            <div class="comment-text">${sanitizeHtml(text)}</div>
           </div>
           <div class="comment-footer">
             <div class="likes">
@@ -229,6 +244,17 @@ function toggleAddingCommentMessage(show) {
             textElement.classList.remove("error");
         }
     }
+    
+    // Функция для сброса стилей валидации
+   function resetValidation() {
+        nameElement.classList.remove("error");
+        textElement.classList.remove("error");
+   }
+
+   // Обработчик события при вводе текста в поля ввода
+    nameElement.addEventListener("input", resetValidation);
+    textElement.addEventListener("input", resetValidation);
+     
 
       // Функция для получения текущей даты и времени
     function getCurrentDateTime() {
