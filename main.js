@@ -1,4 +1,6 @@
-const buttonElement = document.getElementById("add-button");
+    import { sanitizeHtml } from "./sanitizeHtml";
+
+    const buttonElement = document.getElementById("add-button");
     const listElement = document.getElementById("list");
     const textInputElement = document.getElementById("text-input");
 
@@ -25,6 +27,7 @@ const buttonElement = document.getElementById("add-button");
           <li class="task">
             <p class="task-text">
               ${task.text}
+              ${sanitizeHtml(htmlString)}
               <button data-id="${task.id}" class="button delete-button">Удалить</button>
             </p>
           </li>`;
