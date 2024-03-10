@@ -70,8 +70,9 @@
                
                 renderComments(data.comments);
             })
-            .catch((error) => {               
-                if (error && error.message === "Ошибка при загрузке комментариев") {
+            .catch((error) => { 
+                console.error("Ошибка сервера: 500", error);              
+                if (error && error.message === "Ошибка сервера") {
                     alert("Не удалось загрузить комментарии.");
                 } else if (error && error.message === "Ошибка 500: Внутренняя ошибка сервера") {
                     alert("Сервер сломался, попробуйте позже.");
@@ -139,7 +140,7 @@
                 loadCommentsFromAPI();                                               
             }) 
             .catch((error) => {
-              
+                console.error("Ошибка при добавления комментария:", error);
                 if (error && error.message === "Ошибка при добавлении комментария") {
                     console.log("Ошибка 400:", error.message);
                     alert("Имя и комментарий должны содержать не менее 3x символов.");
