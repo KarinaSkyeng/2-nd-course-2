@@ -67,7 +67,6 @@
             .then((data) => {             
                 // Скрываем сообщение о загрузке после загрузки комментариев
                 document.getElementById("loading-message").style.display = "none";
-
                
                 renderComments(data.comments);
             })
@@ -77,13 +76,10 @@
                 } else if (error && error.message === "Ошибка 500: Внутренняя ошибка сервера") {
                     alert("Сервер сломался, попробуйте позже.");
                 }  else {
-                    alert("Произошла ошибка при загрузке комментариев.");
+                    alert("Сервер сломался, попробуйте позже.");
             } 
-
-                // Скрываем сообщение о загрузке в случае ошибки
+             
                 document.getElementById("loading-message").style.display = "none";
-
-                // Отображаем заглушку
                 document.querySelector(".comments").innerHTML = "<li>Не удалось загрузить комментарии</li>";
             });
     }
@@ -125,8 +121,7 @@
 
         const options = {
             method: "POST",
-            body: JSON.stringify(newComment),
-            // Установка параметра forceError: true для получения 500-й ошибки
+            body: JSON.stringify(newComment),            
             forceError: true,
         };
 
@@ -140,15 +135,14 @@
             .then((data) => {
                 nameElement.value = "";
                 textElement.value = "";
-                // Загружаем комментарии после успешного добавления
+                
                 loadCommentsFromAPI();                                               
             }) 
             .catch((error) => {
-                console.error("Ошибка при добавлении комментария:", error);
-                // Обработка ошибок 400-го уровня
+              
                 if (error && error.message === "Ошибка при добавлении комментария") {
                     console.log("Ошибка 400:", error.message);
-                    alert("Имя и комментарий должны содержать не менее 3 символов.");
+                    alert("Имя и комментарий должны содержать не менее 3x символов.");
                 }
             })                       
             .finally(() => {
