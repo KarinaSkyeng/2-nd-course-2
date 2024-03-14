@@ -32,208 +32,232 @@
 </div>
 
 <script>
-  "use strict";
-  document.addEventListener("DOMContentLoaded", () => {
-      loadCommentsFromAPI();
-  });
+    "use strict";
+    document.addEventListener("DOMContentLoaded", () => {
+        loadCommentsFromAPI();
+    });
 
-  const sanitizeHtml = (htmlString) => {
-      return htmlString.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
-  };
+    const sanitizeHtml = (htmlString) => {
+        return htmlString.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+    };
+   
+    // Переменные для сохранения введенных данных
+    let enteredName = "";
+    let enteredText = "";
 
-  // Найти элементы формы
-  const nameElement = document.querySelector(".add-form-name");
-  const textElement = document.querySelector(".add-form-text");
-  const buttonElement = document.querySelector(".add-form-button");
-  const commentsList = document.querySelector(".comments");
+    // Найти элементы формы
+    const nameElement = document.querySelector(".add-form-name");
+    const textElement = document.querySelector(".add-form-text");
+    const buttonElement = document.querySelector(".add-form-button");
+    const commentsList = document.querySelector(".comments");
 
-  // Функция для загрузки списка комментариев из API
-  function loadCommentsFromAPI() {
-      // Показываем сообщение о загрузке
-      document.getElementById("loading-message").style.display = "block";
+    // Функция для загрузки списка комментариев из API
+    function loadCommentsFromAPI() {
+        // Показываем сообщение о загрузке
+        document.getElementById("loading-message").style.display = "block";
 
-      fetch("https://wedev-api.sky.pro/api/v1/karina-korneva/comments")
-          .then((response) => response.json())
-          .then((data) => {
-              // Скрываем сообщение о загрузке после загрузки комментариев
-              document.getElementById("loading-message").style.display = "none";
+        fetch("https://wedev-api.sky.pro/api/v1/karina-korneva/comments")
+            .then((response) => {
+                    if (!response.ok) {
+                        throw new Error("Ошибка при добавлении комментария");
+                    } 
+                        return response.json();
+                                                    
+            })
+            .then((data) => {             
+                // Скрываем сообщение о загрузке после загрузки комментариев
+                document.getElementById("loading-message").style.display = "none";
+               
+                renderComments(data.comments);
+            })
+            .catch((error) => { 
+                console.error("Ошибка при загрузке комментариев:", error);
+                // Выводим алерт о произошедшей ошибке
+                alert("Сервер сломался, попробуйте позже.");
 
-              // Обновляем отображение комментариев на странице
-              renderComments(data.comments);
-          })
-          .catch((error) => {
-              console.error("Ошибка при загрузке комментариев:", error);
-              
-              // Скрываем сообщение о загрузке в случае ошибки
-              document.getElementById("loading-message").style.display = "none";
-          });
-  }
+                // Скрываем сообщение о загрузке в случае ошибки
+                document.getElementById("loading-message").style.display = "none";
 
-  function toggleAddingCommentMessage(show) {
-const addingCommentMessage = document.getElementById("adding-comment-message");
-const addButton = document.querySelector(".add-form-button");
+                // Отображаем заглушку
+                document.querySelector(".comments").innerHTML = "<li>Не удалось загрузить комментарии</li>";
+            });
+    }
 
-if (show) {
-    addingCommentMessage.style.display = "block";
-    addButton.style.display = "none";
-  } else {
-    addingCommentMessage.style.display = "none";
-    addButton.style.display = "block";
-  }
-}
-  // Функция для добавления комментария в список и обновления отображения
-  function addComment() {
-      const name = nameElement.value.trim();
-      const text = textElement.value.trim();
+    function toggleAddingCommentMessage(show) {
+        const addingCommentMessage = document.getElementById("adding-comment-message");
+        const addButton = document.querySelector(".add-form-button");
 
-      if (!name || !text) {
-          highlightEmptyFields();
-          return;
-      }
+            if (show) {
+                addingCommentMessage.style.display = "block";
+                addButton.style.display = "none";
+            } else {
+                addingCommentMessage.style.display = "none";
+                addButton.style.display = "block";
+            }
+    }
 
-      toggleAddingCommentMessage(true);
+    // Функция для добавления комментария в список и обновления отображения
+    function addComment() {
+        const name = nameElement.value.trim();
+        const text = textElement.value.trim();
 
-          const newComment = {
-          name: name,
-          text: text,
-      };
+            if (!name || !text) {
+                highlightEmptyFields();
+                return;
+            }
 
-      const options = {
-          method: "POST",
-          body: JSON.stringify(newComment),
-      };
+        // Сохраняем введенные данные
+        enteredName = name;
+        enteredText = text;
 
-      fetch("https://wedev-api.sky.pro/api/v1/karina-korneva/comments", options)
-          .then((response) => {
-              if (!response.ok) {
-                  throw new Error("Ошибка при добавлении комментария");
-              }
-              return response.json();
-          })
-          .then((data) => {
-              loadCommentsFromAPI();                               
-          })
-          .catch((error) => {
-              console.error("Ошибка при добавлении комментария:", error);                                
-          })
-          .finally(() => {
-            toggleAddingCommentMessage(false); // Скрываем сообщение о добавлении комментария
-          });
-  }
+        toggleAddingCommentMessage(true);
 
-  // Обработчик события для кнопки "Написать"
-  buttonElement.addEventListener("click", addComment);
+        const newComment = {
+            name: name,
+            text: text,
+            forceError: true,
+        };
 
-  // Функция для отрисовки всех комментариев
-  function renderComments(comments) {
-      commentsList.innerHTML = "";
+        const options = {
+            method: "POST",
+            body: JSON.stringify(newComment),            
+            forceError: true,
+        };
 
-      comments.forEach((comment, index) => {
-          const commentElement = createCommentElement(
-              comment.author.name,
-              comment.text,
-              comment.date,
-              comment.likes,
-              comment.liked
-          );
+        fetch("https://wedev-api.sky.pro/api/v1/karina-korneva/comments", options)
+            .then((response) => {
+                if (!response.ok) {
+                    if (response.status === 500) {
+                        throw new Error("Ошибка сервера");
+                    } else {
+                    throw new Error("Ошибка при добавлении комментария");
+                    }
+                }
+                return response.json();
+            })
+            .then((data) => {
+                nameElement.value = "";
+                textElement.value = "";
+                
+                loadCommentsFromAPI();                                               
+            }) 
+            .catch((error) => {
+                console.error("Ошибка при добавления комментария:", error);
+                if (error && error.message === "Ошибка при добавлении комментария") {
+                    console.log("Ошибка 400:", error.message);
+                    alert("Имя и комментарий должны содержать не менее 3x символов.");
+                }
+            })                       
+            .finally(() => {
+                toggleAddingCommentMessage(false); // Скрываем сообщение о добавлении комментария
+            });
+    }
 
-          commentsList.appendChild(commentElement);
+    // Обработчик события для кнопки "Написать"
+    buttonElement.addEventListener("click", addComment);
 
-          const likeButton = commentElement.querySelector(".like-button");
-          likeButton.dataset.commentIndex = index;
+    // Функция для отрисовки всех комментариев
+    function renderComments(comments) {
+        commentsList.innerHTML = "";
 
-          likeButton.addEventListener("click", () => {
-              updateLikesState(likeButton, index, comments);
-          });
-      });
-  }
+        comments.forEach((comment, index) => {
+            const commentElement = createCommentElement(
+                comment.author.name,
+                comment.text,
+                comment.date,
+                comment.likes,
+                comment.liked
+            );
 
-  // Функция для обновления состояния лайка
-  function updateLikesState(likeButton, commentIndex, comments) {
-      const comment = comments[commentIndex];
+            commentsList.appendChild(commentElement);
 
-      comment.liked = !comment.liked;
+            const likeButton = commentElement.querySelector(".like-button");
+            likeButton.dataset.commentIndex = index;
 
-      if (comment.liked) {
-          comment.likes++;
-      } else {
-          comment.likes--;
-      }
+            likeButton.addEventListener("click", () => {
+                updateLikesState(likeButton, index, comments);
+            });
+        });
+    }
 
-      renderComments(comments);
-  }
+    // Функция для обновления состояния лайка
+    function updateLikesState(likeButton, commentIndex, comments) {
+        const comment = comments[commentIndex];
 
-  // Функция для создания элемента комментария
-  function createCommentElement(name, text, date, likes, liked) {
-      const formattedDate = getCurrentDateTime();
-      const comment = document.createElement("li");
-      comment.classList.add("comment");
+        comment.liked = !comment.liked;
 
-      const commentHTML = `
-        <div class="comment-header">
-          <div>${name}</div>
-          <div>${formattedDate}</div>
-        </div>
-        <div class="comment-body">
-          <div class="comment-text">${text}</div>
-        </div>
-        <div class="comment-footer">
-          <div class="likes">
-            <span class="likes-counter">${likes}</span>
-            <button class="like-button ${liked ? "-active-like" : ""}"></button>
+        if (comment.liked) {
+            comment.likes++;
+        } else {
+            comment.likes--;
+        }
+
+        renderComments(comments);
+    }
+
+    // Функция для создания элемента комментария
+    function createCommentElement(name, text, date, likes, liked) {
+        const formattedDate = getCurrentDateTime();
+        const comment = document.createElement("li");
+        comment.classList.add("comment");
+
+        const commentHTML = `
+          <div class="comment-header">
+            <div>${sanitizeHtml(name)}</div>
+            <div>${formattedDate}</div>
           </div>
-        </div>
-      `;
+          <div class="comment-body">
+            <div class="comment-text">${sanitizeHtml(text)}</div>
+          </div>
+          <div class="comment-footer">
+            <div class="likes">
+              <span class="likes-counter">${likes}</span>
+              <button class="like-button ${liked ? "-active-like" : ""}"></button>
+            </div>
+          </div>
+        `;
 
-      comment.innerHTML = commentHTML;
+        comment.innerHTML = commentHTML;
 
-      return comment;
-  }
+        return comment;
+    }
 
-  // Функция для подсветки пустых полей
-  function highlightEmptyFields() {
-      if (!nameElement.value.trim()) {
-          nameElement.classList.add("error");
-      } else {
-          nameElement.classList.remove("error");
-      }
-      if (!textElement.value.trim()) {
-          textElement.classList.add("error");
-      } else {
-          textElement.classList.remove("error");
-      }
-  }
+    // Функция для подсветки пустых полей
+    function highlightEmptyFields() {
+        if (!nameElement.value.trim()) {
+            nameElement.classList.add("error");
+        } else {
+            nameElement.classList.remove("error");
+        }
+        if (!textElement.value.trim()) {
+            textElement.classList.add("error");
+        } else {
+            textElement.classList.remove("error");
+        }
+    }
+    
+    // Функция для сброса стилей валидации
+   function resetValidation() {
+        nameElement.classList.remove("error");
+        textElement.classList.remove("error");
+   }
 
-  // Обработчик события для кнопки "Написать"
-  buttonElement.addEventListener("click", () => {
-      const name = nameElement.value.trim();
-      const text = textElement.value.trim();
+   // Обработчик события при вводе текста в поля ввода
+    nameElement.addEventListener("input", resetValidation);
+    textElement.addEventListener("input", resetValidation);
+     
 
-      if (!name || !text) {
-          highlightEmptyFields();
-          return;
-      }
-
-      // Очищаем поля формы
-      nameElement.value = "";
-      textElement.value = "";
-
-      // Убираем подсветку пустых полей
-      nameElement.classList.remove("error");
-      textElement.classList.remove("error");
-  });
-
-  // Функция для получения текущей даты и времени
-  function getCurrentDateTime() {
-      const options = {
-          day: "2-digit",
-          month: "2-digit",
-          year: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-      };
-      return new Date().toLocaleString("ru-RU", options).replace(",", "");
-  }
+      // Функция для получения текущей даты и времени
+    function getCurrentDateTime() {
+        const options = {
+            day: "2-digit",
+            month: "2-digit",
+            year: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+        };
+        return new Date().toLocaleString("ru-RU", options).replace(",", "");
+    }
 </script>
 </body>
 </html>
