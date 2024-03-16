@@ -6,8 +6,8 @@ document.addEventListener("DOMContentLoaded", () => {
     loadCommentsFromAPI();
 });
 
-const nameElement = document.querySelector(".add-form-name");
-const textElement = document.querySelector(".add-form-text");
+export const nameElement = document.querySelector(".add-form-name");
+export const textElement = document.querySelector(".add-form-text");
 
 export function loadCommentsFromAPI() {
     document.getElementById("loading-message").style.display = "block";

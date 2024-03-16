@@ -1,9 +1,12 @@
 import { addComment } from "./comments.js";
 import { getCurrentDateTime } from "./helpers.js";
 import { sanitizeHtml } from "./sanitizeHtml.js";
+import { nameElement, textElement } from "./main.js";
+
+let commentsList;
 
 export function renderComments(comments) {
-    const commentsList = document.querySelector(".comments");
+    commentsList = document.querySelector(".comments");
     commentsList.innerHTML = "";
 
     comments.forEach((comment) => {        
@@ -12,7 +15,9 @@ export function renderComments(comments) {
             comment.text,
             comment.date,
             comment.likes,
-            comment.liked
+            comment.liked,
+            nameElement, 
+            textElement
         );
 
         commentsList.appendChild(commentElement);
@@ -50,19 +55,17 @@ function createCommentElement(name, text, date, likes, liked) {
 
     commentElement.innerHTML = commentHTML;
 
+  
     // Обработчик события клика на комментарий
 commentsList.addEventListener("click", function(event) {
   const clickedElement = event.target;
 
-  // Проверяем, что клик был на комментарии или на одном из его дочерних элементов
   const commentElement = clickedElement.closest(".comment");
-  if (commentElement) {
-    // Проверяем, что клик не был на кнопке лайка
+  if (commentElement) {    
     if (!clickedElement.classList.contains("like-button")) {
       const name = commentElement.querySelector(".comment-header div:first-child").textContent; 
       const text = commentElement.querySelector(".comment-text").textContent; 
 
-      // Подставляем имя и текст комментария в форму добавления комментария
       nameElement.value = name;
       textElement.value = `@${name}, ${text}`; 
     }
