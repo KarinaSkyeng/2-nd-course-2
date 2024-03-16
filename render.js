@@ -50,6 +50,25 @@ function createCommentElement(name, text, date, likes, liked) {
 
     commentElement.innerHTML = commentHTML;
 
+    // Обработчик события клика на комментарий
+commentsList.addEventListener("click", function(event) {
+  const clickedElement = event.target;
+
+  // Проверяем, что клик был на комментарии или на одном из его дочерних элементов
+  const commentElement = clickedElement.closest(".comment");
+  if (commentElement) {
+    // Проверяем, что клик не был на кнопке лайка
+    if (!clickedElement.classList.contains("like-button")) {
+      const name = commentElement.querySelector(".comment-header div:first-child").textContent; 
+      const text = commentElement.querySelector(".comment-text").textContent; 
+
+      // Подставляем имя и текст комментария в форму добавления комментария
+      nameElement.value = name;
+      textElement.value = `@${name}, ${text}`; 
+    }
+  }
+});
+
     return commentElement;
 }
 
