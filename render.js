@@ -6,8 +6,7 @@ export function renderComments(comments) {
     const commentsList = document.querySelector(".comments");
     commentsList.innerHTML = "";
 
-    comments.forEach((comment, index) => {
-        
+    comments.forEach((comment) => {        
         const commentElement = createCommentElement(
             comment.author.name,
             comment.text,
@@ -19,19 +18,19 @@ export function renderComments(comments) {
         commentsList.appendChild(commentElement);
 
         const likeButton = commentElement.querySelector(".like-button");
-        likeButton.dataset.commentIndex = index;
+        likeButton.dataset.commentIndex = comments.indexOf(comment).toString();
 
         likeButton.addEventListener("click", () => {
-            updateLikesState(likeButton, index, comments);
+            updateLikesState(likeButton, comments);
         });
     });
     addComment()
 }
 
 function createCommentElement(name, text, date, likes, liked) {
-    const formattedDate = getCurrentDateTime();
-    const comment = document.createElement("li");
-    comment.classList.add("comment");
+    const formattedDate = getCurrentDateTime(date);
+    const commentElement = document.createElement("li");
+    commentElement.classList.add("comment");
 
     const commentHTML = `
       <div class="comment-header">
@@ -49,12 +48,14 @@ function createCommentElement(name, text, date, likes, liked) {
       </div>
     `;
 
-    comment.innerHTML = commentHTML;
+    commentElement.innerHTML = commentHTML;
 
-    return comment;
+    return commentElement;
 }
 
-function updateLikesState(likeButton, commentIndex, comments) {
+function updateLikesState(likeButton, comments) {
+  const commentIndex = parseInt(likeButton.dataset.commentIndex);
+
     const comment = comments[commentIndex];
 
     comment.liked = !comment.liked;
@@ -67,3 +68,4 @@ function updateLikesState(likeButton, commentIndex, comments) {
 
     renderComments(comments);
 }
+

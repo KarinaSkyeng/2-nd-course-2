@@ -6,9 +6,6 @@ document.addEventListener("DOMContentLoaded", () => {
     loadCommentsFromAPI();
 });
 
-let enteredName = "";
-let enteredText = "";
-
 const nameElement = document.querySelector(".add-form-name");
 const textElement = document.querySelector(".add-form-text");
 
