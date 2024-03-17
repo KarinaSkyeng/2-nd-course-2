@@ -1,8 +1,10 @@
-import { postTodo, getTodos } from "./api.js";
+import { getTodos } from "./api.js";
 import { resetValidation } from "./validation.js";
 import { renderComments } from "./render.js";
+import { addComment } from "./comments.js";
 
 document.addEventListener("DOMContentLoaded", () => {
+    addComment()
     loadCommentsFromAPI();
 });
 
@@ -34,4 +36,3 @@ nameElement.addEventListener("input", () => {
 textElement.addEventListener("input", () => {
     resetValidation(nameElement, textElement);
 });
-

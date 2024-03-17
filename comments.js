@@ -16,8 +16,7 @@ export function addComment() {
                 return;
             }
     
-            toggleAddingCommentMessage(true);
-    
+            toggleAddingCommentMessage(true);    
     
         const newComment = {
             name: name,
@@ -41,6 +40,5 @@ export function addComment() {
             .finally(() => {
                 toggleAddingCommentMessage(false); // Скрываем сообщение о добавлении комментария
             });
-    });
-    
+    });    
 }

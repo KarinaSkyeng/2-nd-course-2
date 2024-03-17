@@ -1,4 +1,4 @@
-import { addComment } from "./comments.js";
+
 import { getCurrentDateTime } from "./helpers.js";
 import { sanitizeHtml } from "./sanitizeHtml.js";
 import { nameElement, textElement } from "./main.js";
@@ -28,8 +28,7 @@ export function renderComments(comments) {
         likeButton.addEventListener("click", () => {
             updateLikesState(likeButton, comments);
         });
-    });
-    addComment()
+    });    
 }
 
 function createCommentElement(name, text, date, likes, liked) {
@@ -89,5 +88,4 @@ function updateLikesState(likeButton, comments) {
     }
 
     renderComments(comments);
-}
-
+  }
