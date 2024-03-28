@@ -2,11 +2,13 @@ import { postTodo } from "./api.js";
 import { toggleAddingCommentMessage } from "./loaders.js";
 import { loadCommentsFromAPI } from "./main.js";
 import { highlightEmptyFields } from "./validation.js";
+import { getUser } from "./auth.js";
 
 export function addComment() {
     const buttonElement = document.querySelector(".add-form-button");
     const nameElement = document.querySelector(".add-form-name");
     const textElement = document.querySelector(".add-form-text");
+    
     buttonElement.addEventListener("click", () => {
         const name = nameElement.value.trim();
         const text = textElement.value.trim();
@@ -16,15 +18,20 @@ export function addComment() {
                 return;
             }
     
-            toggleAddingCommentMessage(true);    
+            toggleAddingCommentMessage(true);  
+           
+            // Проверяем, авторизован ли пользователь
+        const currentUser = getUser();
     
+    if (currentUser) {
         const newComment = {
             name: name,
             text: text,
             forceError: true,
-        };
-        
-            postTodo(newComment).then((data) => {
+        };   
+               
+        postTodo(newComment)
+            .then((data) => {
                 nameElement.value = "";
                 textElement.value = "";
                 
@@ -40,5 +47,10 @@ export function addComment() {
             .finally(() => {
                 toggleAddingCommentMessage(false); // Скрываем сообщение о добавлении комментария
             });
+        } else {
+            // Если пользователь не авторизован, выполните действия, например, покажите форму для авторизации
+            console.log("Пользователь не авторизован. Показываем форму для авторизации.");
+            // Дополнительные действия в случае, если пользователь не авторизован
+        }
     });    
 }
