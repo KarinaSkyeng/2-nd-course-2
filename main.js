@@ -40,7 +40,7 @@ loginElement.querySelector('#login-button').addEventListener("click", async () =
 
     try {
         console.log("Отправляем данные на сервер для входа:", username, password);
-        await login({ login, password });
+        await login({ login: username, password });
         handleSuccessfulLogin();// Обработка успешной аутентификации
     } catch (error) {
         console.error("Ошибка при входе:", error);

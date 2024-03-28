@@ -25,41 +25,16 @@ export function postTodo(newComment) {
         headers: {
             Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({
-            login: "glebka",
-            password: "123456",
-             
-            forceError: true,
-        })           
-    })
-    .then(response => {
+        body: JSON.stringify(newComment) 
+           /* login: "glebka",
+            password: "123456",*/         
+        })        
+        .then(response => {
         if (!response.ok) {
             throw new Error("Ошибка при аутентификации");
         }
         return response.json();
-    })
-    .then(data => {
-        const receivedToken = data.token; // Получаем Bearer токен из ответа сервера
-        console.log("Полученный токен:", receivedToken);
-        // Используем полученный токен для отправки запроса на добавление комментария
-        return fetch("https://wedev-api.sky.pro/api/v2/karina-korneva/comments", {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${token}`, // Устанавливаем заголовок с Bearer токеном 
-            },
-            body: JSON.stringify(newComment)
-        });
-    })
-    .then((response) => {
-        if (!response.ok) {
-            if (response.status === 500) {
-                throw new Error("Ошибка сервера");
-            } else {
-            throw new Error("Ошибка при добавлении комментария");
-            }
-        }
-        return response.json();
-    })
+    })    
     .catch(error => {
         console.error("Ошибка:", error);
         throw error; 

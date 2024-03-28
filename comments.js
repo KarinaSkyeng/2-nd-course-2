@@ -26,8 +26,7 @@ export function addComment() {
     if (currentUser) {
         const newComment = {
             name: name,
-            text: text,
-            forceError: true,
+            text: text
         };   
                
         postTodo(newComment)
