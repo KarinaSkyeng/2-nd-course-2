@@ -1,11 +1,9 @@
 
 export const login = async ({ login, password }) => {
+    console.log(login, password);
     return fetch("https://wedev-api.sky.pro/api/user/login", {
         method: "POST", 
-        headers: {
-            "Content-Type": "application/json"  
-        },
-        body: JSON.stringify({ login, password })
+        body: JSON.stringify({ login, password }),
     })
     .then(response => {
         console.log("Получен ответ от сервера:", response);
