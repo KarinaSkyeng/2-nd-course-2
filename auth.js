@@ -1,3 +1,4 @@
+import { addComment } from "./comments.js";
 
 export const login = async ({ login, password }) => {
     console.log(login, password);
@@ -14,6 +15,8 @@ export const login = async ({ login, password }) => {
     })
     .then(data => {
         console.log("Данные авторизации получены:", data);
+        console.log("Токен:", data.user.token);
+        localStorage.setItem("token", data.user.token);
         setUser(data.user); 
         return data;
     })
@@ -23,9 +26,10 @@ export const login = async ({ login, password }) => {
     });
 };
 
-export function handleSuccessfulLogin() {
-    document.querySelector(".add-form").style.display = "block";
-    // Вызываем функцию добавления комментария
+export function handleSuccessfulLogin() { 
+    document.querySelector(".add-form").style.display = "flex";
+    document.querySelector(".login").style.display = "none";
+    addComment(); // Вызываем функцию добавления комментария
 }
 
 let currentUser = null;

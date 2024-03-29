@@ -8,7 +8,9 @@ export function addComment() {
     const buttonElement = document.querySelector(".add-form-button");
     const nameElement = document.querySelector(".add-form-name");
     const textElement = document.querySelector(".add-form-text");
+    const currentUser = getUser();
     
+    nameElement.value = currentUser.name;
     buttonElement.addEventListener("click", () => {
         const name = nameElement.value.trim();
         const text = textElement.value.trim();
@@ -21,8 +23,7 @@ export function addComment() {
             toggleAddingCommentMessage(true);  
            
             // Проверяем, авторизован ли пользователь
-        const currentUser = getUser();
-    
+            console.log("Hello", currentUser);
     if (currentUser) {
         const newComment = {
             name: name,
