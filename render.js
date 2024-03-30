@@ -58,13 +58,24 @@ loginElement.querySelector('#login-button').addEventListener("click", async () =
   const username = document.querySelector("#username").value;
   const password = document.querySelector("#password-login").value;
 
+  // Проверка на корректность данных
+  if (username.trim() === '' || password.trim() === '') {
+    alert('Пожалуйста, введите логин и пароль');
+    return; // Прерываем выполнение кода
+  }
+
   try {
       console.log("Отправляем данные на сервер для входа:", username, password);
       await login({ login: username, password });
-      handleSuccessfulLogin();// Обработка успешной аутентификации
+      handleSuccessfulLogin();
   } catch (error) {
       console.error("Ошибка при входе:", error);
-      // Обработка ошибки входа
+     
+      if (error.message === "Неверные учетные данные") {
+        alert('Произошла ошибка при попытке входа. Пожалуйста, попробуйте еще раз.');
+    } else {
+        alert('Неверный логин или пароль');
+    }
   }
 });
 }
