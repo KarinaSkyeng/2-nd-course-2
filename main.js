@@ -1,12 +1,12 @@
 import { getTodos } from "./api.js";
 import { resetValidation } from "./validation.js";
-import { renderComments, renderLoginForm } from "./render.js";
+import { renderComments, renderLoginForm, hideComments } from "./render.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     // Добавляем обработчик события на слово "авторизуйтесь"
     document.getElementById("login-link").addEventListener("click", () => {
+        hideComments();
         renderLoginForm(); // Функция для отображения формы авторизации
-
         document.getElementById('auth-message').style.display = 'none';
     });
 

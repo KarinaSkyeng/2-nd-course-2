@@ -1,4 +1,5 @@
 import { addComment } from "./comments.js";
+import { showComments } from "./render.js";
 
 export const login = async ({ login, password }) => {
     console.log(login, password);
@@ -30,6 +31,7 @@ export function handleSuccessfulLogin() {
     document.querySelector(".add-form").style.display = "flex";
     document.querySelector(".login").style.display = "none";
     addComment(); // Вызываем функцию добавления комментария
+    showComments();
 }
 
 let currentUser = null;

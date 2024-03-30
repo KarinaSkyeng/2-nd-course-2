@@ -20,10 +20,8 @@ export function addComment() {
                 return;
             }
     
-            toggleAddingCommentMessage(true);  
+            toggleAddingCommentMessage(true);           
            
-            // Проверяем, авторизован ли пользователь
-            console.log("Hello", currentUser);
     if (currentUser) {
         const newComment = {
             name: name,

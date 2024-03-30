@@ -32,6 +32,18 @@ export function renderComments(comments) {
     });    
 }
 
+// Функция для скрытия списка комментариев
+export function hideComments() {
+  const commentsList = document.querySelector('.comments');
+  commentsList.style.display = 'none';
+}
+
+// Функция для отображения списка комментариев
+export function showComments() {
+  const commentsList = document.querySelector('.comments');
+  commentsList.style.display = 'block';
+}
+
 // Функция для отображения формы авторизации
 export function renderLoginForm() {
   const loginElement = document.createElement("div");
@@ -69,15 +81,15 @@ loginElement.querySelector('#login-button').addEventListener("click", async () =
       await login({ login: username, password });
       handleSuccessfulLogin();
   } catch (error) {
-      console.error("Ошибка при входе:", error);
-     
-      if (error.message === "Неверные учетные данные") {
-        alert('Произошла ошибка при попытке входа. Пожалуйста, попробуйте еще раз.');
-    } else {
-        alert('Неверный логин или пароль');
+        console.error("Ошибка при входе:", error);
+      
+        if (error.message === "Неверные учетные данные") {
+          alert('Произошла ошибка при попытке входа. Пожалуйста, попробуйте еще раз.');
+      } else {
+          alert('Неверный логин или пароль');
+      }
     }
-  }
-});
+  }); 
 }
 
 function createCommentElement(name, text, date, likes, liked) {
