@@ -6,6 +6,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // Добавляем обработчик события на слово "авторизуйтесь"
     document.getElementById("login-link").addEventListener("click", () => {
         renderLoginForm(); // Функция для отображения формы авторизации
+
+        document.getElementById('auth-message').style.display = 'none';
     });
 
     loadCommentsFromAPI();

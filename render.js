@@ -52,7 +52,8 @@ export function renderLoginForm() {
   // Вставляем форму авторизации перед словом "авторизуйтесь"
   const authMessage = document.getElementById("auth-message");
   authMessage.parentNode.insertBefore(loginElement, authMessage);
-// Добавляем обработчик события на кнопку "Войти"
+
+  // Добавляем обработчик события на кнопку "Войти"
 loginElement.querySelector('#login-button').addEventListener("click", async () => {
   const username = document.querySelector("#username").value;
   const password = document.querySelector("#password-login").value;
