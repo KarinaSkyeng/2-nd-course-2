@@ -95,6 +95,7 @@ body {
   .link-login {
     color: blue;
     text-decoration: underline;
+    cursor: pointer;
   }
   .login-form {
     padding: 20px;

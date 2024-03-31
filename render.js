@@ -41,7 +41,7 @@ export function hideComments() {
 // Функция для отображения списка комментариев
 export function showComments() {
   const commentsList = document.querySelector('.comments');
-  commentsList.style.display = 'block';
+  commentsList.style.display = 'flex';
 }
 
 // Функция для отображения формы авторизации
