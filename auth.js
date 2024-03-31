@@ -1,3 +1,4 @@
+import { setToken } from "./api.js";
 import { addComment } from "./comments.js";
 import { showComments } from "./render.js";
 
@@ -18,7 +19,9 @@ export const login = async ({ login, password }) => {
         console.log("Данные авторизации получены:", data);
         console.log("Токен:", data.user.token);
         localStorage.setItem("token", data.user.token);
+        setToken(data.user.token);
         setUser(data.user); 
+        
         return data;
     })
     .catch(error => {

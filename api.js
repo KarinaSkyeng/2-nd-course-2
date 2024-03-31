@@ -1,5 +1,9 @@
 const token = localStorage.getItem("token");
 
+export function setToken(newToken) {
+    localStorage.setItem("token", token);
+}
+
 export function getTodos() {
     return fetch("https://wedev-api.sky.pro/api/v2/karina-korneva/comments", {
         headers: {
