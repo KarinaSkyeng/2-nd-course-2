@@ -1,7 +1,7 @@
 const token = localStorage.getItem("token");
 
 export function setToken(newToken) {
-    localStorage.setItem("token", token);
+    localStorage.setItem("token", newToken);
 }
 
 export function getTodos() {
