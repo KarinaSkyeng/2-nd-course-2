@@ -1,10 +1,15 @@
 import { getTodos } from "./api.js";
 import { resetValidation } from "./validation.js";
-import { renderComments } from "./render.js";
-import { addComment } from "./comments.js";
+import { renderComments, renderLoginForm, hideComments } from "./render.js";
 
 document.addEventListener("DOMContentLoaded", () => {
-    addComment()
+    // Добавляем обработчик события на слово "авторизуйтесь"
+    document.getElementById("login-link").addEventListener("click", () => {
+        hideComments();
+        renderLoginForm(); // Функция для отображения формы авторизации
+        document.getElementById('auth-message').style.display = 'none';
+    });
+
     loadCommentsFromAPI();
 });
 
@@ -13,11 +18,9 @@ export const textElement = document.querySelector(".add-form-text");
 
 export function loadCommentsFromAPI() {
     document.getElementById("loading-message").style.display = "block";
-
     
         getTodos().then((data) => {
             document.getElementById("loading-message").style.display = "none";
-           
             renderComments(data.comments);
         })
         .catch((error) => { 
@@ -25,7 +28,6 @@ export function loadCommentsFromAPI() {
             alert("Сервер сломался, попробуйте позже.");
 
             document.getElementById("loading-message").style.display = "none";
-
             document.querySelector(".comments").innerHTML = "<li>Не удалось загрузить комментарии</li>";
         });
 }

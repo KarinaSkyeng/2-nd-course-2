@@ -1,28 +1,45 @@
+const token = localStorage.getItem("token");
+
+export function setToken(newToken) {
+    localStorage.setItem("token", newToken);
+}
+
 export function getTodos() {
-    return fetch("https://wedev-api.sky.pro/api/v1/karina-korneva/comments")
+    return fetch("https://wedev-api.sky.pro/api/v2/karina-korneva/comments", {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
     .then((response) => {
             if (!response.ok) {
-                throw new Error("Ошибка при добавлении комментария");
+                throw new Error("Ошибка при получении комментария");
             } 
-                return response.json();
-                                            
+                return response.json();                                            
     })
+    .catch(error => {
+        console.error("Ошибка:", error);
+        throw error;
+    });
 }
 
 export function postTodo(newComment) {
-    return fetch("https://wedev-api.sky.pro/api/v1/karina-korneva/comments", {
+    return fetch("https://wedev-api.sky.pro/api/v2/karina-korneva/comments", {
         method: "POST",
-        body: JSON.stringify(newComment),            
-        forceError: true,
-    })
-    .then((response) => {
+        headers: {
+            Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(newComment) 
+           /* login: "glebka",
+            password: "123456",*/         
+        })        
+        .then(response => {
         if (!response.ok) {
-            if (response.status === 500) {
-                throw new Error("Ошибка сервера");
-            } else {
-            throw new Error("Ошибка при добавлении комментария");
-            }
+            throw new Error("Ошибка при аутентификации");
         }
         return response.json();
-    })
+    })    
+    .catch(error => {
+        console.error("Ошибка:", error);
+        throw error; 
+    });
 }

@@ -2,6 +2,7 @@
 import { getCurrentDateTime } from "./helpers.js";
 import { sanitizeHtml } from "./sanitizeHtml.js";
 import { nameElement, textElement } from "./main.js";
+import { login, handleSuccessfulLogin } from "./auth.js";
 
 let commentsList;
 
@@ -29,6 +30,66 @@ export function renderComments(comments) {
             updateLikesState(likeButton, comments);
         });
     });    
+}
+
+// Функция для скрытия списка комментариев
+export function hideComments() {
+  const commentsList = document.querySelector('.comments');
+  commentsList.style.display = 'none';
+}
+
+// Функция для отображения списка комментариев
+export function showComments() {
+  const commentsList = document.querySelector('.comments');
+  commentsList.style.display = 'flex';
+}
+
+// Функция для отображения формы авторизации
+export function renderLoginForm() {
+  const loginElement = document.createElement("div");
+  loginElement.classList.add("login");
+
+  const loginHTML = `
+  <div class="login-form">
+      <input class="login-input-pass" type="text" id="username" placeholder="Логин">
+      <input class="login-input-pass" type="password" id="password-login" placeholder="Пароль">
+      <button class="button-login" id="login-button">Войти</button>
+  </div>
+  `;
+
+  loginElement.innerHTML = loginHTML;
+
+  document.querySelector(".add-form").style.display = "none";
+
+  // Вставляем форму авторизации перед словом "авторизуйтесь"
+  const authMessage = document.getElementById("auth-message");
+  authMessage.parentNode.insertBefore(loginElement, authMessage);
+
+  // Добавляем обработчик события на кнопку "Войти"
+loginElement.querySelector('#login-button').addEventListener("click", async () => {
+  const username = document.querySelector("#username").value;
+  const password = document.querySelector("#password-login").value;
+
+  // Проверка на корректность данных
+  if (username.trim() === '' || password.trim() === '') {
+    alert('Пожалуйста, введите логин и пароль');
+    return; // Прерываем выполнение кода
+  }
+
+  try {
+      console.log("Отправляем данные на сервер для входа:", username, password);
+      await login({ login: username, password });
+      handleSuccessfulLogin();
+  } catch (error) {
+        console.error("Ошибка при входе:", error);
+      
+        if (error.message === "Неверные учетные данные") {
+          alert('Произошла ошибка при попытке входа. Пожалуйста, попробуйте еще раз.');
+      } else {
+          alert('Неверный логин или пароль');
+      }
+    }
+  }); 
 }
 
 function createCommentElement(name, text, date, likes, liked) {
