@@ -1,5 +1,16 @@
 {
+  "name": "2-nd-course-2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
   "dependencies": {
     "date-fns": "^3.6.0"
-  }
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }

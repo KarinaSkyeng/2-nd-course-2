@@ -1,5 +1,5 @@
-
-import { getCurrentDateTime } from "./helpers.js";
+import { format } from 'date-fns';
+//import { getCurrentDateTime } from "./helpers.js";
 import { sanitizeHtml } from "./sanitizeHtml.js";
 import { nameElement, textElement } from "./main.js";
 import { login, handleSuccessfulLogin } from "./auth.js";
@@ -8,13 +8,15 @@ let commentsList;
 
 export function renderComments(comments) {
     commentsList = document.querySelector(".comments");
-    commentsList.innerHTML = "";
-
-    comments.forEach((comment) => {        
-        const commentElement = createCommentElement(
+    commentsList.innerHTML = ""; 
+  
+    comments.forEach((comment) => { 
+      const createDate = new Date(comment.date);
+      const formattedDate = format(createDate, 'yyyy-MM-dd HH.mm.ss');       
+      const commentElement = createCommentElement(
             comment.author.name,
             comment.text,
-            comment.date,
+            formattedDate,
             comment.likes,
             comment.liked,
             nameElement, 
