@@ -5,6 +5,7 @@ import { nameElement, textElement } from "./main.js";
 import { login, handleSuccessfulLogin } from "./auth.js";
 
 let commentsList;
+let isAuthenticated = false;
 
 export function renderComments(comments) {
     commentsList = document.querySelector(".comments");
@@ -29,7 +30,7 @@ export function renderComments(comments) {
         likeButton.dataset.commentIndex = comments.indexOf(comment).toString();
 
         likeButton.addEventListener("click", () => {
-            updateLikesState(likeButton, comments);
+            updateLikesState(likeButton, comments);            
         });
     });    
 }
@@ -82,6 +83,7 @@ loginElement.querySelector('#login-button').addEventListener("click", async () =
       console.log("Отправляем данные на сервер для входа:", username, password);
       await login({ login: username, password });
       handleSuccessfulLogin();
+      isAuthenticated = true;
   } catch (error) {
         console.error("Ошибка при входе:", error);
       
@@ -94,8 +96,8 @@ loginElement.querySelector('#login-button').addEventListener("click", async () =
   }); 
 }
 
-function createCommentElement(name, text, date, likes, liked) {
-    const formattedDate = getCurrentDateTime(date);
+function createCommentElement(name, text, formattedDate, likes, liked) {
+    //const formattedDate = getCurrentDateTime(date);
     const commentElement = document.createElement("li");
     commentElement.classList.add("comment");
 
@@ -141,6 +143,12 @@ function updateLikesState(likeButton, comments) {
   const commentIndex = parseInt(likeButton.dataset.commentIndex);
 
     const comment = comments[commentIndex];
+
+     // Проверяем статус авторизации пользователя
+     if (!isAuthenticated) {
+      alert("Пожалуйста, авторизуйтесь, чтобы поставить лайк.");
+      return; // Прерываем выполнение функции, если пользователь не авторизован
+  }
 
     comment.liked = !comment.liked;
 
