@@ -35,12 +35,16 @@ export function addComment() {
                 
                 loadCommentsFromAPI();                                               
             }) 
-            .catch((error) => {
-                console.error("Ошибка при добавления комментария:", error);
-                if (error && error.message === "Ошибка при добавлении комментария") {
+            .catch(error => {
+                console.error("Ошибка при добавлении комментария:", error);
+                if (error && error.message === "Ошибка при отправке комментария") {
                     console.log("Ошибка 400:", error.message);
-                    alert("Имя и комментарий должны содержать не менее 3x символов.");
+                    alert("Имя и комментарий должны содержать не менее 3-х символов.");
+                } else {
+                    console.log("Ошибка 400:", error.message);
+                    alert("Произошла ошибка при отправке комментария.");
                 }
+                throw error; 
             })                       
             .finally(() => {
                 toggleAddingCommentMessage(false); // Скрываем сообщение о добавлении комментария

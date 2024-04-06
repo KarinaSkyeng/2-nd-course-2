@@ -84,7 +84,8 @@ loginElement.querySelector('#login-button').addEventListener("click", async () =
       await login({ login: username, password });
       handleSuccessfulLogin();
       isAuthenticated = true;
-  } catch (error) {
+  } 
+  catch (error) {
         console.error("Ошибка при входе:", error);
       
         if (error.message === "Неверные учетные данные") {
@@ -93,7 +94,10 @@ loginElement.querySelector('#login-button').addEventListener("click", async () =
           alert('Неверный логин или пароль');
       }
     }
-  }); 
+  })
+  .catch(error => {
+    console.error("Ошибка при входе:", error);
+  });
 }
 
 function createCommentElement(name, text, formattedDate, likes, liked) {
@@ -130,7 +134,7 @@ commentsList.addEventListener("click", function(event) {
       const name = commentElement.querySelector(".comment-header div:first-child").textContent; 
       const text = commentElement.querySelector(".comment-text").textContent; 
 
-      nameElement.value = name;
+      nameElement.value = "";
       textElement.value = `@${name}, ${text}`; 
     }
   }

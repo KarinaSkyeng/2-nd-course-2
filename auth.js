@@ -24,13 +24,19 @@ export const login = async ({ login, password }) => {
         
         return data;
     })
-    .catch(error => {
-        console.error("Ошибка:", error);
+     .catch(error => {
+        console.error("Ошибка при входе:", error);
+        if (error.message === "Ошибка при входе") {
+            alert('Произошла ошибка при попытке входа. Пожалуйста, попробуйте еще раз.');
+        } else {
+            alert('Неверный логин или пароль');
+        }
         throw error;
     });
 };
 
 export function handleSuccessfulLogin() { 
+    isAutenticated = true;
     document.querySelector(".add-form").style.display = "flex";
     document.querySelector(".login").style.display = "none";
     addComment(); // Вызываем функцию добавления комментария

@@ -30,17 +30,22 @@ export function postTodo(newComment) {
             Authorization: `Bearer ${token}`
         },
         body: JSON.stringify(newComment) 
-           /* login: "glebka",
-            password: "123456",*/         
-        })        
-        .then(response => {
+    })        
+    .then(response => {
         if (!response.ok) {
-            throw new Error("Ошибка при аутентификации");
+            throw new Error("Ошибка при отправке комментария");
         }
         return response.json();
     })    
     .catch(error => {
-        console.error("Ошибка:", error);
+        console.error("Ошибка при добавлении комментария:", error);
+        if (error && error.message === "Ошибка при отправке комментария") {
+            console.log("Ошибка 400:", error.message);
+            alert("Имя и комментарий должны содержать не менее 3-х символов.");
+        } else {
+            console.log("Ошибка 400:", error.message);
+            alert("Произошла ошибка при отправке комментария.");
+        }
         throw error; 
     });
 }
