@@ -40,11 +40,7 @@ export function addComment() {
                 if (error && error.message === "Ошибка при отправке комментария") {
                     console.log("Ошибка 400:", error.message);
                     alert("Имя и комментарий должны содержать не менее 3-х символов.");
-                } else {
-                    console.log("Ошибка 400:", error.message);
-                    alert("Произошла ошибка при отправке комментария.");
-                }
-                throw error; 
+                } 
             })                       
             .finally(() => {
                 toggleAddingCommentMessage(false); // Скрываем сообщение о добавлении комментария

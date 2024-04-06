@@ -123,12 +123,11 @@ function createCommentElement(name, text, formattedDate, likes, liked) {
 
     commentElement.innerHTML = commentHTML;
 
-  
-    // Обработчик события клика на комментарий
+      // Обработчик события клика на комментарий
 commentsList.addEventListener("click", function(event) {
   const clickedElement = event.target;
-
   const commentElement = clickedElement.closest(".comment");
+  
   if (commentElement) {    
     if (!clickedElement.classList.contains("like-button")) {
       const name = commentElement.querySelector(".comment-header div:first-child").textContent; 
