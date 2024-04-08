@@ -100,6 +100,33 @@ loginElement.querySelector('#login-button').addEventListener("click", async () =
   });
 }
 
+export function renderCommentsForm() {
+  const initialComments = document.querySelector('.add-form');
+    const initialHTML = `
+    <div class="add-form">
+          <input
+              type="text" 
+              readonly 
+              class="add-form-name"
+              placeholder="Введите ваше имя"
+          />
+          <textarea
+              type="textarea"
+              class="add-form-text"
+              placeholder="Введите ваш комментарий"
+              rows="4"
+          ></textarea>
+          <div class="add-form-row">
+              <button class="add-form-button">Написать</button>
+              <div id="adding-comment-message" style="display: none;">Комментарий добавляется...</div>
+          </div>
+      </div>
+      `;
+  
+     initialComments.innerHTML = initialHTML
+  }
+  
+
 function createCommentElement(name, text, formattedDate, likes, liked) {
     //const formattedDate = getCurrentDateTime(date);
     const commentElement = document.createElement("li");
