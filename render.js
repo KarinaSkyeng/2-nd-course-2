@@ -1,8 +1,9 @@
 import { format } from 'date-fns';
 //import { getCurrentDateTime } from "./helpers.js";
 import { sanitizeHtml } from "./sanitizeHtml.js";
-import { nameElement, textElement } from "./main.js";
+//import { nameElement, textElement } from "./main.js";
 import { login, handleSuccessfulLogin } from "./auth.js";
+import { addComment } from "./comments.js";
 
 let commentsList;
 let isAuthenticated = false;
@@ -20,8 +21,8 @@ export function renderComments(comments) {
             formattedDate,
             comment.likes,
             comment.liked,
-            nameElement, 
-            textElement
+            //nameElement, 
+            //textElement
         );
 
         commentsList.appendChild(commentElement);
@@ -35,16 +36,12 @@ export function renderComments(comments) {
     });    
 }
 
-// Функция для скрытия списка комментариев
-export function hideComments() {
-  const commentsList = document.querySelector('.comments');
-  commentsList.style.display = 'none';
-}
-
 // Функция для отображения списка комментариев
 export function showComments() {
-  const commentsList = document.querySelector('.comments');
-  commentsList.style.display = 'flex';
+  getTodos().then((data) => {    
+    renderComments(data.comments);
+    renderCommentsForm();
+});
 }
 
 // Функция для отображения формы авторизации
@@ -61,8 +58,8 @@ export function renderLoginForm() {
   `;
 
   loginElement.innerHTML = loginHTML;
-
-  document.querySelector(".add-form").style.display = "none";
+const container = document.querySelector(".container");
+container.innerHTML = loginElement;
 
   // Вставляем форму авторизации перед словом "авторизуйтесь"
   const authMessage = document.getElementById("auth-message");
@@ -95,14 +92,12 @@ loginElement.querySelector('#login-button').addEventListener("click", async () =
       }
     }
   })
-  .catch(error => {
-    console.error("Ошибка при входе:", error);
-  });
+ 
 }
 
 export function renderCommentsForm() {
-  const initialComments = document.querySelector('.add-form');
-    const initialHTML = `
+  const container = document.querySelector('.container');
+    const addFormHTML = `
     <div class="add-form">
           <input
               type="text" 
@@ -123,9 +118,10 @@ export function renderCommentsForm() {
       </div>
       `;
   
-     initialComments.innerHTML = initialHTML
-  }
-  
+     container.innerHTML = addFormHTML
+
+     addComment(); 
+  }  
 
 function createCommentElement(name, text, formattedDate, likes, liked) {
     //const formattedDate = getCurrentDateTime(date);
@@ -160,8 +156,8 @@ commentsList.addEventListener("click", function(event) {
       const name = commentElement.querySelector(".comment-header div:first-child").textContent; 
       const text = commentElement.querySelector(".comment-text").textContent; 
 
-      nameElement.value = "";
-      textElement.value = `@${name}, ${text}`; 
+      //nameElement.value = "";
+      //textElement.value = `@${name}, ${text}`; 
     }
   }
 });

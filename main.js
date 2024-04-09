@@ -1,21 +1,22 @@
 import { getTodos } from "./api.js";
-import { resetValidation } from "./validation.js";
-import { renderComments, renderLoginForm, hideComments, renderCommentsForm } from "./render.js";
+//import { resetValidation } from "./validation.js";
+import { renderComments, renderLoginForm } from "./render.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     // Добавляем обработчик события на слово "авторизуйтесь"
     document.getElementById("login-link").addEventListener("click", () => {
-        hideComments();
+        //hideComments();
         renderLoginForm(); // Функция для отображения формы авторизации
-        renderCommentsForm();
+
+        //renderCommentsForm();
         document.getElementById('auth-message').style.display = 'none';
     });
   
     loadCommentsFromAPI();
 });
 
-export const nameElement = document.querySelector(".add-form-name");
-export const textElement = document.querySelector(".add-form-text");
+//export const nameElement = document.querySelector(".add-form-name");
+//export const textElement = document.querySelector(".add-form-text");
 
 export function loadCommentsFromAPI() {
     document.getElementById("loading-message").style.display = "block";
@@ -33,9 +34,9 @@ export function loadCommentsFromAPI() {
         });
 }
 
-nameElement.addEventListener("input", () => {
-    resetValidation(nameElement, textElement);
-});
-textElement.addEventListener("input", () => {
-    resetValidation(nameElement, textElement);
-});
+//nameElement.addEventListener("input", () => {
+//    resetValidation(nameElement, textElement);
+//});
+//textElement.addEventListener("input", () => {
+//    resetValidation(nameElement, textElement);
+//});
