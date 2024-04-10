@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { add, format } from 'date-fns';
 //import { getCurrentDateTime } from "./helpers.js";
 import { sanitizeHtml } from "./sanitizeHtml.js";
 //import { nameElement, textElement } from "./main.js";
@@ -11,7 +11,7 @@ let isAuthenticated = false;
 
 export function renderComments(comments) {
   const app = document.getElementById('app')
-  const appFormHTML = `
+  const addFormHTML = `
   <div class="add-form">
   <input
       type="text" 
@@ -60,21 +60,30 @@ ${token ? addFormHTML : ` <div class="add-authorization" id="auth-message">Чт�
         likeButton.addEventListener("click", () => {
             updateLikesState(likeButton, comments);            
         });
-    });    
+    }); 
+    
+    addComment();
 }
 
 // Функция для отображения списка комментариев
 export function showComments() {
-  getTodos().then((data) => {    
-    renderComments(data.comments);
-    renderCommentsForm();
-});
+    getTodos().then((data) => {    
+      renderComments(data.comments);   
+  });
+}
+
+function renderButtonAuth() {
+  if(token) {
+    return
+  }
+  document.getElementById("login-link").addEventListener("click", () => {
+    renderLoginForm();
+  });
 }
 
 // Функция для отображения формы авторизации
 export function renderLoginForm() {
-  const loginElement = document.createElement("div");
-  loginElement.classList.add("login");
+  const app = document.getElementById('app')
 
   const loginHTML = `
   <div class="login-form">
@@ -84,16 +93,11 @@ export function renderLoginForm() {
   </div>
   `;
 
-  loginElement.innerHTML = loginHTML;
-const container = document.querySelector(".container");
-container.innerHTML = loginElement;
+  app.innerHTML = loginHTML;
 
-  // Вставляем форму авторизации перед словом "авторизуйтесь"
-  const authMessage = document.getElementById("auth-message");
-  authMessage.parentNode.insertBefore(loginElement, authMessage);
 
   // Добавляем обработчик события на кнопку "Войти"
-loginElement.querySelector('#login-button').addEventListener("click", async () => {
+document.querySelector('#login-button').addEventListener("click", async () => {
   const username = document.querySelector("#username").value;
   const password = document.querySelector("#password-login").value;
 
@@ -121,11 +125,7 @@ loginElement.querySelector('#login-button').addEventListener("click", async () =
   })
  
 }
-
-
-
-     addComment(); 
-   
+  
 
 function createCommentElement(name, text, formattedDate, likes, liked) {
     //const formattedDate = getCurrentDateTime(date);
