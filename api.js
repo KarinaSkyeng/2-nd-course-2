@@ -1,4 +1,4 @@
-let token = localStorage.getItem("token");
+export let token = localStorage.getItem("token");
 
 export function setToken(newToken) {
     localStorage.setItem("token", newToken);

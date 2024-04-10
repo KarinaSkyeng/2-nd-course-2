@@ -4,11 +4,38 @@ import { sanitizeHtml } from "./sanitizeHtml.js";
 //import { nameElement, textElement } from "./main.js";
 import { login, handleSuccessfulLogin } from "./auth.js";
 import { addComment } from "./comments.js";
+import { getTodos, token } from "./api.js"
 
 let commentsList;
 let isAuthenticated = false;
 
 export function renderComments(comments) {
+  const app = document.getElementById('app')
+  const appFormHTML = `
+  <div class="add-form">
+  <input
+      type="text" 
+      readonly 
+      class="add-form-name"
+      placeholder="Введите ваше имя"
+  />
+  <textarea
+      type="textarea"
+      class="add-form-text"
+      placeholder="Введите ваш комментарий"
+      rows="4"
+  ></textarea>
+  <div class="add-form-row">
+      <button class="add-form-button">Написать</button>
+      <div id="adding-comment-message" style="display: none;">Комментарий добавляется...</div>
+  </div>
+</div>
+`;
+
+app.innerHTML = `
+<ul class="comments"><!-- Комментарии --></ul>
+${token ? addFormHTML : ` <div class="add-authorization" id="auth-message">Чтобы добавить комментарий, <span class="link-login" id="login-link">авторизуйтесь</span>.</div>`}
+`
     commentsList = document.querySelector(".comments");
     commentsList.innerHTML = ""; 
   
@@ -95,33 +122,10 @@ loginElement.querySelector('#login-button').addEventListener("click", async () =
  
 }
 
-export function renderCommentsForm() {
-  const container = document.querySelector('.container');
-    const addFormHTML = `
-    <div class="add-form">
-          <input
-              type="text" 
-              readonly 
-              class="add-form-name"
-              placeholder="Введите ваше имя"
-          />
-          <textarea
-              type="textarea"
-              class="add-form-text"
-              placeholder="Введите ваш комментарий"
-              rows="4"
-          ></textarea>
-          <div class="add-form-row">
-              <button class="add-form-button">Написать</button>
-              <div id="adding-comment-message" style="display: none;">Комментарий добавляется...</div>
-          </div>
-      </div>
-      `;
-  
-     container.innerHTML = addFormHTML
+
 
      addComment(); 
-  }  
+   
 
 function createCommentElement(name, text, formattedDate, likes, liked) {
     //const formattedDate = getCurrentDateTime(date);
