@@ -1,10 +1,10 @@
-import { postTodo } from "./api.js";
+import { postTodo, token } from "./api.js";
 import { toggleAddingCommentMessage } from "./loaders.js";
 import { loadCommentsFromAPI } from "./main.js";
 import { highlightEmptyFields } from "./validation.js";
 import { getUser } from "./auth.js";
 
-export function addComment() {
+export function addComment(token) {
     if(!token) {
         return
     }

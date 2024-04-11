@@ -125,8 +125,7 @@ document.querySelector('#login-button').addEventListener("click", async () => {
     }
   })
  
-}
-  
+}  
 
 function createCommentElement(name, text, formattedDate, likes, liked) {
     //const formattedDate = getCurrentDateTime(date);
