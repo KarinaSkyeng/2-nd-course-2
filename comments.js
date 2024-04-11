@@ -36,7 +36,7 @@ export function addComment(token) {
                 nameElement.value = "";
                 textElement.value = "";
                 
-                loadCommentsFromAPI();                                               
+                loadCommentsFromAPI(data);                                               
             }) 
             .catch(error => {
                 console.error("Ошибка при добавлении комментария:", error);
@@ -50,8 +50,7 @@ export function addComment(token) {
             });
         } else {
             // Если пользователь не авторизован, выполните действия, например, покажите форму для авторизации
-            console.log("Пользователь не авторизован. Показываем форму для авторизации.");
-            // Дополнительные действия в случае, если пользователь не авторизован
+            console.log("Пользователь не авторизован. Показываем форму для авторизации.");            
         }
     });    
 }

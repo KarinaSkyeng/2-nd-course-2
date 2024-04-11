@@ -9,8 +9,9 @@ import { getTodos, token } from "./api.js"
 let commentsList;
 let isAuthenticated = false;
 
-export function renderComments(comments) {
-  const app = document.getElementById('app')
+export function renderComments(comments, token) {
+  const app = document.getElementById('app');
+
   const addFormHTML = `
   <div class="add-form">
   <input
@@ -35,7 +36,7 @@ export function renderComments(comments) {
 app.innerHTML = `
 <ul class="comments"></ul>
 ${token ? addFormHTML : ` <div class="add-authorization" id="auth-message">Чтобы добавить комментарий, <span class="link-login" id="login-link">авторизуйтесь</span>.</div>`}
-`
+`;
     commentsList = document.querySelector(".comments");
     commentsList.innerHTML = ""; 
   
@@ -47,9 +48,7 @@ ${token ? addFormHTML : ` <div class="add-authorization" id="auth-message">Чт�
             comment.text,
             formattedDate,
             comment.likes,
-            comment.liked,
-            //nameElement, 
-            //textElement
+            comment.liked,           
         );
 
         commentsList.appendChild(commentElement);
@@ -62,18 +61,18 @@ ${token ? addFormHTML : ` <div class="add-authorization" id="auth-message">Чт�
         });
     }); 
     
-    addComment();
-    renderButtonAuth()
+    addComment(token);
+    renderButtonAuth(token);
 }
 
 // Функция для отображения списка комментариев
-export function showComments() {
+export function showComments(token) {
     getTodos().then((data) => {    
-      renderComments(data.comments);   
+      renderComments(data.comments, token);   
   });
 }
 
-function renderButtonAuth() {
+function renderButtonAuth(token) {
   if(token) {
     return
   }

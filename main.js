@@ -8,9 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     app.innerHTML = `
     <div id="loading-message" style="display: none;">Пожалуйста подождите, загружаю комментарии...</div>
     `
-   //app.innerHTML = app.innerHTML  - это тут нужно??
-
-    loadCommentsFromAPI();
+      loadCommentsFromAPI();
 });
 
 //export const nameElement = document.querySelector(".add-form-name");
