@@ -4,11 +4,11 @@ import { renderComments } from "./render.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     const app = document.getElementById('app')
-    
+
     app.innerHTML = `
     <div id="loading-message" style="display: none;">Пожалуйста подождите, загружаю комментарии...</div>
     `
-   //app.innerHTML = app.innerHTML
+   //app.innerHTML = app.innerHTML  - это тут нужно??
 
     loadCommentsFromAPI();
 });

@@ -1,6 +1,6 @@
 import { setToken } from "./api.js";
 
-import { showComments, renderCommentsForm } from "./render.js";
+import { showComments, renderLoginForm } from "./render.js";
 
 export const login = async ({ login, password }) => {
     console.log(login, password);
@@ -39,7 +39,7 @@ export function handleSuccessfulLogin() {
     //isAutenticated = true;
     //document.querySelector(".add-form").style.display = "flex";
     //document.querySelector(".login").style.display = "none";
-    renderCommentsForm();    
+    renderLoginForm();    
     showComments();
 }
 
