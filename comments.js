@@ -5,6 +5,9 @@ import { highlightEmptyFields } from "./validation.js";
 import { getUser } from "./auth.js";
 
 export function addComment() {
+    if(!token) {
+        return
+    }
     const buttonElement = document.querySelector(".add-form-button");
     const nameElement = document.querySelector(".add-form-name");
     const textElement = document.querySelector(".add-form-text");

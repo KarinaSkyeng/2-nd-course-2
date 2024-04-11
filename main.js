@@ -1,17 +1,15 @@
 import { getTodos } from "./api.js";
 //import { resetValidation } from "./validation.js";
-import { renderComments, renderLoginForm } from "./render.js";
+import { renderComments } from "./render.js";
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Добавляем обработчик события на слово "авторизуйтесь"
-    document.getElementById("login-link").addEventListener("click", () => {
-        //hideComments();
-        renderLoginForm(); // Функция для отображения формы авторизации
+    const app = document.getElementById('app')
+    
+    app.innerHTML = `
+    <div id="loading-message" style="display: none;">Пожалуйста подождите, загружаю комментарии...</div>
+    `
+   //app.innerHTML = app.innerHTML
 
-        //renderCommentsForm();
-        document.getElementById('auth-message').style.display = 'none';
-    });
-  
     loadCommentsFromAPI();
 });
 

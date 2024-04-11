@@ -33,7 +33,7 @@ export function renderComments(comments) {
 `;
 
 app.innerHTML = `
-<ul class="comments"><!-- Комментарии --></ul>
+<ul class="comments"></ul>
 ${token ? addFormHTML : ` <div class="add-authorization" id="auth-message">Чтобы добавить комментарий, <span class="link-login" id="login-link">авторизуйтесь</span>.</div>`}
 `
     commentsList = document.querySelector(".comments");
@@ -63,6 +63,7 @@ ${token ? addFormHTML : ` <div class="add-authorization" id="auth-message">Чт�
     }); 
     
     addComment();
+    renderButtonAuth()
 }
 
 // Функция для отображения списка комментариев
