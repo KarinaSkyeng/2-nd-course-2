@@ -2,6 +2,7 @@ export let token = localStorage.getItem("token");
 
 export function setToken(newToken) {
     localStorage.setItem("token", newToken);
+    console.log(token);
     token = newToken;
 }
 
@@ -42,10 +43,7 @@ export function postTodo(newComment) {
         if (error && error.message === "Ошибка при отправке комментария") {
             console.log("Ошибка 400:", error.message);
             alert("Имя и комментарий должны содержать не менее 3-х символов.");
-        } else {
-            console.log("Ошибка 400:", error.message);
-            alert("Имя и комментарий должны содержать не менее 3-х символов.");
-        }
+        } 
         throw error; 
     });
 }

@@ -2,12 +2,13 @@ import { getTodos } from "./api.js";
 //import { resetValidation } from "./validation.js";
 import { renderComments } from "./render.js";
 
+const loadingMessage = `<div id="loading-message" style="display: none;">Пожалуйста подождите, загружаю комментарии...</div>
+`;
 document.addEventListener("DOMContentLoaded", () => {
-    const app = document.getElementById('app')
+    //const app = document.getElementById('app')
 
-    app.innerHTML = `
-    <div id="loading-message" style="display: none;">Пожалуйста подождите, загружаю комментарии...</div>
-    `
+    //app.innerHTML = loadingMessage
+   
       loadCommentsFromAPI();
 });
 
@@ -15,19 +16,20 @@ document.addEventListener("DOMContentLoaded", () => {
 //export const textElement = document.querySelector(".add-form-text");
 
 export function loadCommentsFromAPI() {
-    document.getElementById("loading-message").style.display = "block";
-    
-        getTodos().then((data) => {
-            document.getElementById("loading-message").style.display = "none";
+    const app = document.getElementById('app')
+
+    app.innerHTML = loadingMessage
+       
+        getTodos().then((data) => {          
             renderComments(data.comments);
         })
         .catch((error) => { 
             console.error("Ошибка при загрузке комментариев:", error);            
             alert("Сервер сломался, попробуйте позже.");
 
-            document.getElementById("loading-message").style.display = "none";
             document.querySelector(".comments").innerHTML = "<li>Не удалось загрузить комментарии</li>";
         });
+        
 }
 
 //nameElement.addEventListener("input", () => {

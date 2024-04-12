@@ -17,8 +17,7 @@ export const login = async ({ login, password }) => {
     })
     .then(data => {
         console.log("Данные авторизации получены:", data);
-        console.log("Токен:", data.user.token);
-        localStorage.setItem("token", data.user.token);
+        console.log("Токен:", data.user.token);       
         setToken(data.user.token);
         setUser(data.user); 
         
@@ -43,16 +42,15 @@ export function handleSuccessfulLogin() {
     showComments();
 }
 
-let currentUser = null;
 
 export function getUser() {
-    return currentUser;
+    return JSON.parse(localStorage.getItem("data"));
 }
 
 export function setUser(userData) {
-    currentUser = userData;
+    localStorage.setItem("data", JSON.stringify(userData));
 }
 
 export function clearUser() {
-    currentUser = null;
+    localStorage.removeItem("data");
 }

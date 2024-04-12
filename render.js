@@ -9,14 +9,13 @@ import { getTodos, token } from "./api.js"
 let commentsList;
 let isAuthenticated = false;
 
-export function renderComments(comments, token) {
+export function renderComments(comments,) {
   const app = document.getElementById('app');
 
   const addFormHTML = `
   <div class="add-form">
   <input
-      type="text" 
-      readonly 
+      type="text"
       class="add-form-name"
       placeholder="Введите ваше имя"
   />
@@ -42,7 +41,7 @@ ${token ? addFormHTML : ` <div class="add-authorization" id="auth-message">Чт�
   
     comments.forEach((comment) => { 
       const createDate = new Date(comment.date);
-      const formattedDate = format(createDate, 'yyyy-MM-dd HH.mm.ss');       
+      const formattedDate = format(createDate, 'yyyy-MM-dd HH.mm.ss'); 
       const commentElement = createCommentElement(
             comment.author.name,
             comment.text,
@@ -72,7 +71,7 @@ export function showComments(token) {
   });
 }
 
-function renderButtonAuth(token) {
+function renderButtonAuth() {
   if(token) {
     return
   }
@@ -94,7 +93,6 @@ export function renderLoginForm() {
   `;
 
   app.innerHTML = loginHTML;
-
 
   // Добавляем обработчик события на кнопку "Войти"
 document.querySelector('#login-button').addEventListener("click", async () => {
@@ -122,11 +120,10 @@ document.querySelector('#login-button').addEventListener("click", async () => {
           alert('Неверный логин или пароль');
       }
     }
-  })
- 
+  }) 
 }  
 
-function createCommentElement(name, text, formattedDate, likes, liked) {
+function createCommentElement(name, text, formattedDate, likes, liked) {  
     //const formattedDate = getCurrentDateTime(date);
     const commentElement = document.createElement("li");
     commentElement.classList.add("comment");
@@ -159,8 +156,8 @@ commentsList.addEventListener("click", function(event) {
       const name = commentElement.querySelector(".comment-header div:first-child").textContent; 
       const text = commentElement.querySelector(".comment-text").textContent; 
 
-      //nameElement.value = "";
-      //textElement.value = `@${name}, ${text}`; 
+      nameElement.value = name;
+      textElement.value = `@${name}, ${text}`; 
     }
   }
 });

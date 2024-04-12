@@ -10,3 +10,4 @@ export function toggleAddingCommentMessage(show) {
             addButton.style.display = "block";
         }
 }
+
