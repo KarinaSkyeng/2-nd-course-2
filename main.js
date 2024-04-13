@@ -12,8 +12,8 @@ document.addEventListener("DOMContentLoaded", () => {
       loadCommentsFromAPI();
 });
 
-//export const nameElement = document.querySelector(".add-form-name");
-//export const textElement = document.querySelector(".add-form-text");
+export const nameElement = document.querySelector(".add-form-name");
+export const textElement = document.querySelector(".add-form-text");
 
 export function loadCommentsFromAPI() {
     const app = document.getElementById('app')

@@ -1,7 +1,7 @@
 import { add, format } from 'date-fns';
 //import { getCurrentDateTime } from "./helpers.js";
 import { sanitizeHtml } from "./sanitizeHtml.js";
-//import { nameElement, textElement } from "./main.js";
+import { nameElement, textElement } from "./main.js";
 import { login, handleSuccessfulLogin } from "./auth.js";
 import { addComment } from "./comments.js";
 import { getTodos, token } from "./api.js"
@@ -59,6 +59,8 @@ ${token ? addFormHTML : ` <div class="add-authorization" id="auth-message">Чт�
             updateLikesState(likeButton, comments);            
         });
     }); 
+
+ 
     
     addComment(token);
     renderButtonAuth(token);
@@ -120,7 +122,7 @@ document.querySelector('#login-button').addEventListener("click", async () => {
           alert('Неверный логин или пароль');
       }
     }
-  }) 
+  }); 
 }  
 
 function createCommentElement(name, text, formattedDate, likes, liked) {  
@@ -146,8 +148,8 @@ function createCommentElement(name, text, formattedDate, likes, liked) {
 
     commentElement.innerHTML = commentHTML;
 
-      // Обработчик события клика на комментарий
-commentsList.addEventListener("click", function(event) {
+    // Обработчик события клика на комментарий
+  commentsList.addEventListener("click", function(event) {
   const clickedElement = event.target;
   const commentElement = clickedElement.closest(".comment");
   

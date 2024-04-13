@@ -6,6 +6,17 @@ export function setToken(newToken) {
     token = newToken;
 }
 
+export async function getToken() {
+    return new Promise((resolve, reject) => {
+        const storedToken = localStorage.getItem("token");
+        if (storedToken) {
+            resolve(storedToken);
+        } else {
+            reject("Токен не найден в localStorage");
+        }
+    });
+}
+
 export function getTodos() {
     return fetch("https://wedev-api.sky.pro/api/v2/karina-korneva/comments", {
         headers: {

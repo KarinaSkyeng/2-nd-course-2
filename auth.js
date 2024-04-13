@@ -1,4 +1,4 @@
-import { setToken } from "./api.js";
+import { setToken, getToken } from "./api.js";
 
 import { showComments, renderLoginForm } from "./render.js";
 
