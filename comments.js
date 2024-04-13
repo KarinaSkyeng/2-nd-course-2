@@ -1,4 +1,4 @@
-import { postTodo, token } from "./api.js";
+import { postTodo } from "./api.js";
 import { toggleAddingCommentMessage } from "./loaders.js";
 import { loadCommentsFromAPI } from "./main.js";
 import { highlightEmptyFields } from "./validation.js";
@@ -21,15 +21,15 @@ export function addComment(token) {
             if (!name || !text) {
                 highlightEmptyFields(nameElement, textElement);
                 return;
-            }
-    
-            toggleAddingCommentMessage(true);           
+            }             
            
     if (currentUser) {
         const newComment = {
             name: name,
             text: text
         };   
+
+        toggleAddingCommentMessage(true);
                
         postTodo(newComment)
             .then(() => {
