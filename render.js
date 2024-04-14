@@ -59,9 +59,8 @@ ${token ? addFormHTML : ` <div class="add-authorization" id="auth-message">Чт�
             updateLikesState(likeButton, comments);            
         });
     }); 
-
  
-    
+    answerComment(comments);
     addComment(token);
     renderButtonAuth(token);
 }
@@ -146,25 +145,21 @@ function createCommentElement(name, text, formattedDate, likes, liked) {
       </div>
     `;
 
-    commentElement.innerHTML = commentHTML;
-
-    // Обработчик события клика на комментарий
-  commentsList.addEventListener("click", function(event) {
-  const clickedElement = event.target;
-  const commentElement = clickedElement.closest(".comment");
-  
-  if (commentElement) {    
-    if (!clickedElement.classList.contains("like-button")) {
-      const name = commentElement.querySelector(".comment-header div:first-child").textContent; 
-      const text = commentElement.querySelector(".comment-text").textContent; 
-
-      nameElement.value = name;
-      textElement.value = `@${name}, ${text}`; 
-    }
-  }
-});
+    commentElement.innerHTML = commentHTML; 
 
     return commentElement;
+}
+
+// Обработчик события клика на комментарий
+function answerComment(comments) {
+  const commentsHtml = document.querySelectorAll('.comment')
+  const formTextHtml = document.querySelector('.add-form-text')
+
+  commentsHtml.forEach((el, index) => {
+    el.addEventListener("click", () => {
+      comments[index]
+    })
+  })
 }
 
 function updateLikesState(likeButton, comments) {
