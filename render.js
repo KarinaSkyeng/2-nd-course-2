@@ -180,7 +180,7 @@ function updateLikesState(likeButton, comments) {
   const comment = comments[commentIndex];
 
      // Проверяем статус авторизации пользователя
-     if (!isAuthenticated) {
+     if (!token) {
       alert("Пожалуйста, авторизуйтесь, чтобы поставить лайк.");
       return; // Прерываем выполнение функции, если пользователь не авторизован
   }
