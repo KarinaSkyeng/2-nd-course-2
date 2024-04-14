@@ -157,9 +157,13 @@ function answerComment(comments) {
 
   commentsHtml.forEach((el, index) => {
     el.addEventListener("click", () => {
-      comments[index]
-    })
-  })
+      // Получаем выбранный комментарий из массива
+    const selectedComment = comments[index]
+
+    // Заполняем текстовое поле формы текстом выбранного комментария
+    formTextHtml.value = `Ответ на комментарий от ${selectedComment.author.name}: ${selectedComment.text}`;
+    });
+  });
 }
 
 function updateLikesState(likeButton, comments) {
