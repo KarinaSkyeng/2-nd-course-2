@@ -161,7 +161,7 @@ function answerComment(comments) {
     const selectedComment = comments[index]
 
     // Заполняем текстовое поле формы текстом выбранного комментария
-    formTextHtml.value = `Ответ на комментарий от ${selectedComment.author.name}: ${selectedComment.text}`;
+    formTextHtml.value = `Ответ на: ${selectedComment.text}`;
     });
   });
 }
