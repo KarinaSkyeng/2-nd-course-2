@@ -67,9 +67,15 @@ ${token ? addFormHTML : ` <div class="add-authorization" id="auth-message">Чт�
 
 // Функция для отображения списка комментариев
 export function showComments(token) {
-    getTodos().then((data) => {    
+    getTodos()
+    .then((data) => {    
       renderComments(data.comments, token);   
-  });
+    })
+      .catch((error) => {
+        // Обработка ошибки загрузки данных, если необходимо
+        console.error("Ошибка при загрузке комментариев:", error);
+        alert("Не удалось загрузить комментарии с сервера. Попробуйте обновить страницу позже.");
+    });
 }
 
 function renderButtonAuth() {
@@ -157,19 +163,21 @@ function answerComment(comments) {
 
   commentsHtml.forEach((el, index) => {
     el.addEventListener("click", () => {
+    // Проверяем, что клик произошел не на кнопке лайка
+    if (!event.target.classList.contains("like-button")) { 
       // Получаем выбранный комментарий из массива
     const selectedComment = comments[index]
 
     // Заполняем текстовое поле формы текстом выбранного комментария
     formTextHtml.value = `Ответ на: ${selectedComment.text}`;
+    }
     });
   });
 }
 
 function updateLikesState(likeButton, comments) {
   const commentIndex = parseInt(likeButton.dataset.commentIndex);
-
-    const comment = comments[commentIndex];
+  const comment = comments[commentIndex];
 
      // Проверяем статус авторизации пользователя
      if (!isAuthenticated) {

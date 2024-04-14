@@ -34,10 +34,7 @@ export const login = async ({ login, password }) => {
     });
 };
 
-export function handleSuccessfulLogin() { 
-    //isAutenticated = true;
-    //document.querySelector(".add-form").style.display = "flex";
-    //document.querySelector(".login").style.display = "none";
+export function handleSuccessfulLogin() {    
     renderLoginForm();    
     showComments();
 }
