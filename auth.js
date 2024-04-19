@@ -1,6 +1,6 @@
-import { setToken } from "./api.js";
-import { addComment } from "./comments.js";
-import { showComments } from "./render.js";
+import { setToken, getToken } from "./api.js";
+
+import { showComments, renderLoginForm } from "./render.js";
 
 export const login = async ({ login, password }) => {
     console.log(login, password);
@@ -17,36 +17,37 @@ export const login = async ({ login, password }) => {
     })
     .then(data => {
         console.log("Данные авторизации получены:", data);
-        console.log("Токен:", data.user.token);
-        localStorage.setItem("token", data.user.token);
+        console.log("Токен:", data.user.token);       
         setToken(data.user.token);
         setUser(data.user); 
         
         return data;
     })
-    .catch(error => {
-        console.error("Ошибка:", error);
+     .catch(error => {
+        console.error("Ошибка при входе:", error);
+        if (error.message === "Ошибка при входе") {
+            alert('Произошла ошибка при попытке входа. Пожалуйста, попробуйте еще раз.');
+        } else {
+            alert('Неверный логин или пароль');
+        }
         throw error;
     });
 };
 
-export function handleSuccessfulLogin() { 
-    document.querySelector(".add-form").style.display = "flex";
-    document.querySelector(".login").style.display = "none";
-    addComment(); // Вызываем функцию добавления комментария
+export function handleSuccessfulLogin() {    
+    renderLoginForm();    
     showComments();
 }
 
-let currentUser = null;
 
 export function getUser() {
-    return currentUser;
+    return JSON.parse(localStorage.getItem("data"));
 }
 
 export function setUser(userData) {
-    currentUser = userData;
+    localStorage.setItem("data", JSON.stringify(userData));
 }
 
 export function clearUser() {
-    currentUser = null;
+    localStorage.removeItem("data");
 }

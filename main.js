@@ -1,40 +1,40 @@
 import { getTodos } from "./api.js";
-import { resetValidation } from "./validation.js";
-import { renderComments, renderLoginForm, hideComments } from "./render.js";
+//import { resetValidation } from "./validation.js";
+import { renderComments } from "./render.js";
 
+const loadingMessage = `<div id="loading-message" style="display: none;">Пожалуйста подождите, загружаю комментарии...</div>
+`;
 document.addEventListener("DOMContentLoaded", () => {
-    // Добавляем обработчик события на слово "авторизуйтесь"
-    document.getElementById("login-link").addEventListener("click", () => {
-        hideComments();
-        renderLoginForm(); // Функция для отображения формы авторизации
-        document.getElementById('auth-message').style.display = 'none';
-    });
+    //const app = document.getElementById('app')
 
-    loadCommentsFromAPI();
+    //app.innerHTML = loadingMessage
+   
+      loadCommentsFromAPI();
 });
 
 export const nameElement = document.querySelector(".add-form-name");
 export const textElement = document.querySelector(".add-form-text");
 
 export function loadCommentsFromAPI() {
-    document.getElementById("loading-message").style.display = "block";
-    
-        getTodos().then((data) => {
-            document.getElementById("loading-message").style.display = "none";
+    const app = document.getElementById('app')
+
+    app.innerHTML = loadingMessage
+       
+        getTodos().then((data) => {          
             renderComments(data.comments);
         })
         .catch((error) => { 
             console.error("Ошибка при загрузке комментариев:", error);            
             alert("Сервер сломался, попробуйте позже.");
 
-            document.getElementById("loading-message").style.display = "none";
             document.querySelector(".comments").innerHTML = "<li>Не удалось загрузить комментарии</li>";
         });
+        
 }
 
-nameElement.addEventListener("input", () => {
-    resetValidation(nameElement, textElement);
-});
-textElement.addEventListener("input", () => {
-    resetValidation(nameElement, textElement);
-});
+//nameElement.addEventListener("input", () => {
+//    resetValidation(nameElement, textElement);
+//});
+//textElement.addEventListener("input", () => {
+//    resetValidation(nameElement, textElement);
+//});

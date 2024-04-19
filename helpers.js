@@ -1,4 +1,11 @@
-export function getCurrentDateTime(apiDate) {   
+/*import { format } from 'date-fns';
+
+export function getCurrentDateTime(apiDate) {
+    return format(new Date(apiDate), 'yyyy-MM-dd HH.mm.ss'); 
+}*/
+
+
+/*export function getCurrentDateTime(apiDate) {   
     const date = new Date(apiDate);
 
     const options = {
@@ -9,4 +16,4 @@ export function getCurrentDateTime(apiDate) {
         minute: "2-digit",
     };
     return date.toLocaleString("ru-RU", options).replace(",", "");
-}
+}*/

@@ -1,24 +1,53 @@
-
-import { getCurrentDateTime } from "./helpers.js";
+import { add, format } from 'date-fns';
+//import { getCurrentDateTime } from "./helpers.js";
 import { sanitizeHtml } from "./sanitizeHtml.js";
 import { nameElement, textElement } from "./main.js";
 import { login, handleSuccessfulLogin } from "./auth.js";
+import { addComment } from "./comments.js";
+import { getTodos, token } from "./api.js"
 
 let commentsList;
+let isAuthenticated = false;
 
-export function renderComments(comments) {
+export function renderComments(comments,) {
+  const app = document.getElementById('app');
+
+  const addFormHTML = `
+  <div class="add-form">
+  <input
+      type="text"
+      class="add-form-name"
+      placeholder="Введите ваше имя"
+  />
+  <textarea
+      type="textarea"
+      class="add-form-text"
+      placeholder="Введите ваш комментарий"
+      rows="4"
+  ></textarea>
+  <div class="add-form-row">
+      <button class="add-form-button">Написать</button>
+      <div id="adding-comment-message" style="display: none;">Комментарий добавляется...</div>
+  </div>
+</div>
+`;
+
+app.innerHTML = `
+<ul class="comments"></ul>
+${token ? addFormHTML : ` <div class="add-authorization" id="auth-message">Чтобы добавить комментарий, <span class="link-login" id="login-link">авторизуйтесь</span>.</div>`}
+`;
     commentsList = document.querySelector(".comments");
-    commentsList.innerHTML = "";
-
-    comments.forEach((comment) => {        
-        const commentElement = createCommentElement(
+    commentsList.innerHTML = ""; 
+  
+    comments.forEach((comment) => { 
+      const createDate = new Date(comment.date);
+      const formattedDate = format(createDate, 'yyyy-MM-dd HH.mm.ss'); 
+      const commentElement = createCommentElement(
             comment.author.name,
             comment.text,
-            comment.date,
+            formattedDate,
             comment.likes,
-            comment.liked,
-            nameElement, 
-            textElement
+            comment.liked,           
         );
 
         commentsList.appendChild(commentElement);
@@ -27,27 +56,40 @@ export function renderComments(comments) {
         likeButton.dataset.commentIndex = comments.indexOf(comment).toString();
 
         likeButton.addEventListener("click", () => {
-            updateLikesState(likeButton, comments);
+            updateLikesState(likeButton, comments);            
         });
-    });    
-}
-
-// Функция для скрытия списка комментариев
-export function hideComments() {
-  const commentsList = document.querySelector('.comments');
-  commentsList.style.display = 'none';
+    }); 
+ 
+    answerComment(comments);
+    addComment(token);
+    renderButtonAuth(token);
 }
 
 // Функция для отображения списка комментариев
-export function showComments() {
-  const commentsList = document.querySelector('.comments');
-  commentsList.style.display = 'flex';
+export function showComments(token) {
+    getTodos()
+    .then((data) => {    
+      renderComments(data.comments, token);   
+    })
+      .catch((error) => {
+        // Обработка ошибки загрузки данных, если необходимо
+        console.error("Ошибка при загрузке комментариев:", error);
+        alert("Не удалось загрузить комментарии с сервера. Попробуйте обновить страницу позже.");
+    });
+}
+
+function renderButtonAuth() {
+  if(token) {
+    return
+  }
+  document.getElementById("login-link").addEventListener("click", () => {
+    renderLoginForm();
+  });
 }
 
 // Функция для отображения формы авторизации
 export function renderLoginForm() {
-  const loginElement = document.createElement("div");
-  loginElement.classList.add("login");
+  const app = document.getElementById('app')
 
   const loginHTML = `
   <div class="login-form">
@@ -57,16 +99,10 @@ export function renderLoginForm() {
   </div>
   `;
 
-  loginElement.innerHTML = loginHTML;
-
-  document.querySelector(".add-form").style.display = "none";
-
-  // Вставляем форму авторизации перед словом "авторизуйтесь"
-  const authMessage = document.getElementById("auth-message");
-  authMessage.parentNode.insertBefore(loginElement, authMessage);
+  app.innerHTML = loginHTML;
 
   // Добавляем обработчик события на кнопку "Войти"
-loginElement.querySelector('#login-button').addEventListener("click", async () => {
+document.querySelector('#login-button').addEventListener("click", async () => {
   const username = document.querySelector("#username").value;
   const password = document.querySelector("#password-login").value;
 
@@ -80,7 +116,9 @@ loginElement.querySelector('#login-button').addEventListener("click", async () =
       console.log("Отправляем данные на сервер для входа:", username, password);
       await login({ login: username, password });
       handleSuccessfulLogin();
-  } catch (error) {
+      isAuthenticated = true;
+  } 
+  catch (error) {
         console.error("Ошибка при входе:", error);
       
         if (error.message === "Неверные учетные данные") {
@@ -90,10 +128,10 @@ loginElement.querySelector('#login-button').addEventListener("click", async () =
       }
     }
   }); 
-}
+}  
 
-function createCommentElement(name, text, date, likes, liked) {
-    const formattedDate = getCurrentDateTime(date);
+function createCommentElement(name, text, formattedDate, likes, liked) {  
+    //const formattedDate = getCurrentDateTime(date);
     const commentElement = document.createElement("li");
     commentElement.classList.add("comment");
 
@@ -113,32 +151,39 @@ function createCommentElement(name, text, date, likes, liked) {
       </div>
     `;
 
-    commentElement.innerHTML = commentHTML;
-
-  
-    // Обработчик события клика на комментарий
-commentsList.addEventListener("click", function(event) {
-  const clickedElement = event.target;
-
-  const commentElement = clickedElement.closest(".comment");
-  if (commentElement) {    
-    if (!clickedElement.classList.contains("like-button")) {
-      const name = commentElement.querySelector(".comment-header div:first-child").textContent; 
-      const text = commentElement.querySelector(".comment-text").textContent; 
-
-      nameElement.value = name;
-      textElement.value = `@${name}, ${text}`; 
-    }
-  }
-});
+    commentElement.innerHTML = commentHTML; 
 
     return commentElement;
 }
 
+// Обработчик события клика на комментарий
+function answerComment(comments) {
+  const commentsHtml = document.querySelectorAll('.comment')
+  const formTextHtml = document.querySelector('.add-form-text')
+
+  commentsHtml.forEach((el, index) => {
+    el.addEventListener("click", () => {
+    // Проверяем, что клик произошел не на кнопке лайка
+    if (!event.target.classList.contains("like-button")) { 
+      // Получаем выбранный комментарий из массива
+    const selectedComment = comments[index]
+
+    // Заполняем текстовое поле формы текстом выбранного комментария
+    formTextHtml.value = `Ответ на: ${selectedComment.text}`;
+    }
+    });
+  });
+}
+
 function updateLikesState(likeButton, comments) {
   const commentIndex = parseInt(likeButton.dataset.commentIndex);
+  const comment = comments[commentIndex];
 
-    const comment = comments[commentIndex];
+     // Проверяем статус авторизации пользователя
+     if (!token) {
+      alert("Пожалуйста, авторизуйтесь, чтобы поставить лайк.");
+      return; // Прерываем выполнение функции, если пользователь не авторизован
+  }
 
     comment.liked = !comment.liked;
 

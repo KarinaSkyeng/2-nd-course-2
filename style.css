@@ -107,9 +107,9 @@ body {
   
   .add-form {
     padding: 20px;
-    margin-top: 48px;
+    margin-top: 48px; 
+    display: flex;   
     flex-direction: column;
-    display: none;
   }
 
   .add-form-name,
