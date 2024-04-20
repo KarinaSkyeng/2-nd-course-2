@@ -1,5 +1,4 @@
 import { add, format } from 'date-fns';
-//import { getCurrentDateTime } from "./helpers.js";
 import { sanitizeHtml } from "./sanitizeHtml.js";
 import { nameElement, textElement } from "./main.js";
 import { login, handleSuccessfulLogin } from "./auth.js";

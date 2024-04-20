@@ -1,4 +1,4 @@
-import { setToken, getToken } from "./api.js";
+import { setToken } from "./api.js";
 
 import { showComments, renderLoginForm } from "./render.js";
 
@@ -38,7 +38,6 @@ export function handleSuccessfulLogin() {
     renderLoginForm();    
     showComments();
 }
-
 
 export function getUser() {
     return JSON.parse(localStorage.getItem("data"));
