@@ -3,7 +3,7 @@ import { sanitizeHtml } from "./sanitizeHtml.js";
 import { nameElement, textElement } from "./main.js";
 import { login, handleSuccessfulLogin } from "./auth.js";
 import { addComment } from "./comments.js";
-import { getTodos, token } from "./api.js"
+import { getTodos, token, deleteCommentFromServer } from "./api.js"
 
 let commentsList;
 let isAuthenticated = false;
@@ -47,7 +47,8 @@ ${token ? addFormHTML : ` <div class="add-authorization" id="auth-message">Чт�
             formattedDate,
             comment.likes,
             comment.liked,
-            index           
+            index,
+            comment           
         );
 
         commentsList.appendChild(commentElement);
@@ -140,8 +141,7 @@ document.querySelector('#login-button').addEventListener("click", async () => {
   }); 
 }  
 
-function createCommentElement(name, text, formattedDate, likes, liked, index) {  
-    //const formattedDate = getCurrentDateTime(date);
+function createCommentElement(name, text, formattedDate, likes, liked, index, comment) {  
     const commentElement = document.createElement("li");
     commentElement.classList.add("comment");
 
@@ -160,10 +160,18 @@ function createCommentElement(name, text, formattedDate, likes, liked, index) {
         </div>        
       </div>
       <button data-index=${index} class="edit-button">Редактировать</button>
-      <button data-index=${index} class="delete-button" id="delete-button">Удалить</button>
+      <button data-id=${comment.id} class="delete-button" id="delete-button">Удалить</button>
     `;
 
     commentElement.innerHTML = commentHTML; 
+
+   // Находим кнопку "Редактировать" внутри элемента комментария
+   const editButton = commentElement.querySelector('.edit-button');
+
+   // Добавляем обработчик события клика на кнопку "Редактировать"
+   editButton.addEventListener('click', () => {
+       handleEditButtonClick(commentElement, comment);
+   }); 
 
     return commentElement;
 }
@@ -190,23 +198,39 @@ function answerComment(comments) {
 // Обработчик события на кнопку "Удалить"
 function deleteComment(comments) {
   const deleteButtons = document.querySelectorAll('.delete-button');
-
+ 
   deleteButtons.forEach((deleteButton) => {
-    deleteButton.addEventListener('click', () => {
+    deleteButton.addEventListener('click', async () => {
+      // Получаем id комментария из атрибута data-id
+      const commentId = deleteButton.dataset.id;
+
+      try {
+        // Вызываем функцию для удаления комментария с сервера
+        await deleteCommentFromServer(commentId);
+      
       // Получаем индекс комментария из атрибута data-index
       const index = parseInt(deleteButton.dataset.index);
-
       // Удаляем комментарий из массива comments по индексу
       comments.splice(index, 1);
 
       // После удаления комментария из массива, обновляем отображение комментариев
       renderComments(comments);
+    } catch (error) {
+      console.error('Ошибка при удалении комментария:', error);
+      // Обработка ошибок, если необходимо
+    }
     });
   });
 }
 
+function removeButtons(buttons) {
+  buttons.forEach(button => {
+    button.parentNode.removeChild(button);
+  });
+}
+
 // Обработчик события клика на кнопку "Редактировать" комментария
-function handleEditButtonClick(event, comments, commentIndex) {
+function handleEditButtonClick(event, comments) {
   const commentElement = event.target.closest('.comment');
   const commentTextElement = commentElement.querySelector('.comment-text');
   const commentText = commentTextElement.textContent;
@@ -236,28 +260,8 @@ function handleEditButtonClick(event, comments, commentIndex) {
   editButton.parentNode.insertBefore(cancelButton, editButton.nextSibling);
 
   // Добавляем обработчики событий на кнопки "Сохранить" и "Отмена"
-  saveButton.addEventListener('click', (event) => {
-    // Получаем введенный пользователем текст комментария
-    const newText = textarea.value;
-
-    // Обновляем текст комментария в массиве данных
-    comments[commentIndex].text = newText;
-
-    // Обновляем текст комментария в DOM
-    commentTextElement.textContent = newText;
-
-    // Возвращаем интерфейс в исходное состояние
-    commentElement.querySelector('.comment-body').replaceChild(commentTextElement, textarea);
-    
-    // Удаляем кнопки "Сохранить" и "Отмена"
-    saveButton.parentNode.removeChild(saveButton);
-    cancelButton.parentNode.removeChild(cancelButton);
-
-    // Показываем кнопку "Редактировать"
-    editButton.style.display = '';
-
-    // Обновляем список комментариев
-    renderComments(comments);
+  saveButton.addEventListener('click', () => {
+    handleSaveButtonClick(textarea.value, comments);
   });
 
   cancelButton.addEventListener('click', () => {
@@ -268,12 +272,38 @@ function handleEditButtonClick(event, comments, commentIndex) {
     commentElement.querySelector('.comment-body').replaceChild(commentTextElement, textarea);
 
     // Удаляем кнопки "Сохранить" и "Отмена"
-    saveButton.parentNode.removeChild(saveButton);
-    cancelButton.parentNode.removeChild(cancelButton);
+    removeButtons([saveButton, cancelButton]);
 
     // Показываем кнопку "Редактировать"
     editButton.style.display = '';
   });
+}
+
+function handleSaveButtonClick(newText, commentText, comments) {
+  // Обновляем текст комментария в массиве данных
+  // Находим комментарий в массиве comments, который соответствует oldText
+  const comment = comments.find(comment => comment.text === commentText);
+  if (comment) {
+      comment.text = newText;
+  } else {
+      console.error('Комментарий не найден в массиве данных');
+      return;
+  }
+
+  // Обновляем текст комментария в DOM
+  commentTextElement.textContent = newText;
+
+  // Возвращаем интерфейс в исходное состояние
+  commentElement.querySelector('.comment-body').replaceChild(commentTextElement, textarea);
+
+  // Удаляем кнопку "Сохранить"
+  saveButton.parentNode.removeChild(saveButton);
+
+  // Показываем кнопку "Редактировать"
+  editButton.style.display = '';
+
+  // Обновляем список комментариев
+  renderComments(comments);
 }
 
 function updateLikesState(likeButton, comments) {
