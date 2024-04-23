@@ -59,7 +59,7 @@ export function postTodo(newComment) {
     });
 }
 
-export async function deleteCommentFromServer(commentId, token) {
+export async function deleteCommentFromServer(commentId) {
     try {
         const response = await fetch(`https://wedev-api.sky.pro/api/v2/karina-korneva/comments/${commentId}`, {
             method: 'DELETE',

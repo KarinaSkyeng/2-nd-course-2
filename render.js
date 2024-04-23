@@ -1,7 +1,7 @@
 import { format } from 'date-fns';
 import { sanitizeHtml } from "./sanitizeHtml.js";
 import { nameElement, textElement } from "./main.js";
-import { login, handleSuccessfulLogin } from "./auth.js";
+import { login, handleSuccessfulLogin, registerUser, handleSuccessfulRegistration } from "./auth.js";
 import { addComment } from "./comments.js";
 import { getTodos, token, deleteCommentFromServer } from "./api.js"
 
@@ -107,7 +107,8 @@ export function renderLoginForm() {
       <input class="login-input-pass" type="text" id="username" placeholder="Логин">
       <input class="login-input-pass" type="password" id="password-login" placeholder="Пароль">
       <button class="button-login" id="login-button">Войти</button>
-  </div>
+      <span id="add-registration" class="registration-link">Зарегистрируйтесь</span>
+  </div>  
   `;
 
   app.innerHTML = loginHTML;
@@ -139,7 +140,38 @@ document.querySelector('#login-button').addEventListener("click", async () => {
       }
     }
   }); 
+
+  // Получаем ссылку на элемент <span> по его id
+const registrationLink = document.getElementById('add-registration');
+
+// Добавляем обработчик события клика
+registrationLink.addEventListener('click', () => {
+    // Выполняем переход на форму регистрации
+    handleSuccessfulRegistration();
+});
+
 }  
+
+export function renderRegistrationForm() {
+const app = document.getElementById('app')
+
+  const registrationHTML = `
+  <div class="login-form">
+      <h2>Форма Регистрации</h2>
+      <input class="login-input-pass" type="text" id="name" placeholder="Введите имя">
+      <input class="login-input-pass" type="text" id="login" placeholder="Введите логин">
+      <input class="login-input-pass" type="password" id="password" placeholder="Введите пароль">
+      <button class="button-login" id="registration-button">Зарегистроваться</button>
+      <span id="auth-message" class="registration-link">Войти</span>
+  </div>  
+  `;
+
+  app.innerHTML = registrationHTML;
+
+  // Добавляем обработчик события на кнопку "Зарегистроваться"
+  const registrationButton = document.getElementById('registration-button');
+  registrationButton.addEventListener('click', registerUser);
+}
 
 function createCommentElement(name, text, formattedDate, likes, liked, index, comment) {  
     const commentElement = document.createElement("li");

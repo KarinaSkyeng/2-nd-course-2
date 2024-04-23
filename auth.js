@@ -1,6 +1,6 @@
 import { setToken } from "./api.js";
 
-import { showComments, renderLoginForm } from "./render.js";
+import { showComments, renderLoginForm, renderRegistrationForm } from "./render.js";
 
 export const login = async ({ login, password }) => {
     console.log(login, password);
@@ -49,4 +49,29 @@ export function setUser(userData) {
 
 export function clearUser() {
     localStorage.removeItem("data");
+}
+
+// auth.js
+
+export async function registerUser(userData) {
+    try {
+        const response = await fetch('https://wedev-api.sky.pro/api/user', {
+            method: 'POST',
+            body: userData
+        });
+        
+        if (response.ok) {
+            // Обработка успешной регистрации
+        } else {
+            throw new Error('Произошла ошибка при регистрации.');
+        }
+    } catch (error) {
+        console.error('Ошибка регистрации:', error);
+        throw error;
+    }
+}
+
+export function handleSuccessfulRegistration() {
+    // Вызываем функцию для отображения формы регистрации
+    renderRegistrationForm();
 }
