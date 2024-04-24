@@ -1,10 +1,9 @@
-import { add, format } from 'date-fns';
-//import { getCurrentDateTime } from "./helpers.js";
+import { format } from 'date-fns';
 import { sanitizeHtml } from "./sanitizeHtml.js";
 import { nameElement, textElement } from "./main.js";
-import { login, handleSuccessfulLogin } from "./auth.js";
+import { login, handleSuccessfulLogin, registerUser, handleSuccessfulRegistration } from "./auth.js";
 import { addComment } from "./comments.js";
-import { getTodos, token } from "./api.js"
+import { getTodos, token, deleteCommentFromServer } from "./api.js"
 
 let commentsList;
 let isAuthenticated = false;
@@ -39,7 +38,7 @@ ${token ? addFormHTML : ` <div class="add-authorization" id="auth-message">Чт�
     commentsList = document.querySelector(".comments");
     commentsList.innerHTML = ""; 
   
-    comments.forEach((comment) => { 
+    comments.forEach((comment, index) => { 
       const createDate = new Date(comment.date);
       const formattedDate = format(createDate, 'yyyy-MM-dd HH.mm.ss'); 
       const commentElement = createCommentElement(
@@ -47,7 +46,9 @@ ${token ? addFormHTML : ` <div class="add-authorization" id="auth-message">Чт�
             comment.text,
             formattedDate,
             comment.likes,
-            comment.liked,           
+            comment.liked,
+            index,
+            comment           
         );
 
         commentsList.appendChild(commentElement);
@@ -59,17 +60,27 @@ ${token ? addFormHTML : ` <div class="add-authorization" id="auth-message">Чт�
             updateLikesState(likeButton, comments);            
         });
     }); 
+    
  
     answerComment(comments);
     addComment(token);
     renderButtonAuth(token);
+    deleteComment(comments);
+
+    // Добавляем обработчик события клика на кнопку "Редактировать" для каждого комментария
+const editButtons = document.querySelectorAll('.edit-button');
+editButtons.forEach(button => {
+  button.addEventListener('click', handleEditButtonClick);
+});
+
 }
 
 // Функция для отображения списка комментариев
 export function showComments(token) {
     getTodos()
     .then((data) => {    
-      renderComments(data.comments, token);   
+      renderComments(data.comments, token);
+      deleteComment(data.comments);   
     })
       .catch((error) => {
         // Обработка ошибки загрузки данных, если необходимо
@@ -96,7 +107,8 @@ export function renderLoginForm() {
       <input class="login-input-pass" type="text" id="username" placeholder="Логин">
       <input class="login-input-pass" type="password" id="password-login" placeholder="Пароль">
       <button class="button-login" id="login-button">Войти</button>
-  </div>
+      <span id="add-registration" class="registration-link">Зарегистрируйтесь</span>
+  </div>  
   `;
 
   app.innerHTML = loginHTML;
@@ -128,10 +140,40 @@ document.querySelector('#login-button').addEventListener("click", async () => {
       }
     }
   }); 
+
+  // Получаем ссылку на элемент <span> по его id
+const registrationLink = document.getElementById('add-registration');
+
+// Добавляем обработчик события клика
+registrationLink.addEventListener('click', () => {
+    // Выполняем переход на форму регистрации
+    handleSuccessfulRegistration();
+});
+
 }  
 
-function createCommentElement(name, text, formattedDate, likes, liked) {  
-    //const formattedDate = getCurrentDateTime(date);
+export function renderRegistrationForm() {
+const app = document.getElementById('app')
+
+  const registrationHTML = `
+  <div class="registration-form">
+      <h2>Форма Регистрации</h2>
+      <input class="login-input-pass" type="text" id="name" placeholder="Введите имя">
+      <input class="login-input-pass" type="text" id="login" placeholder="Введите логин">
+      <input class="login-input-pass" type="password" id="password" placeholder="Введите пароль">
+      <button class="button-login" id="registration-button">Зарегистроваться</button>
+      <span id="auth-message" class="registration-link">Войти</span>
+  </div>  
+  `;
+
+  app.innerHTML = registrationHTML;
+
+  // Добавляем обработчик события на кнопку "Зарегистроваться"
+  const registrationButton = document.getElementById('registration-button');
+  registrationButton.addEventListener('click', registerUser);
+}
+
+function createCommentElement(name, text, formattedDate, likes, liked, index, comment) {  
     const commentElement = document.createElement("li");
     commentElement.classList.add("comment");
 
@@ -147,11 +189,21 @@ function createCommentElement(name, text, formattedDate, likes, liked) {
         <div class="likes">
           <span class="likes-counter">${likes}</span>
           <button class="like-button ${liked ? "-active-like" : ""}"></button>
-        </div>
+        </div>        
       </div>
+      <button data-index=${index} class="edit-button">Редактировать</button>
+      <button data-id=${comment.id} class="delete-button" id="delete-button">Удалить</button>
     `;
 
     commentElement.innerHTML = commentHTML; 
+
+   // Находим кнопку "Редактировать" внутри элемента комментария
+   const editButton = commentElement.querySelector('.edit-button');
+
+   // Добавляем обработчик события клика на кнопку "Редактировать"
+   editButton.addEventListener('click', () => {
+       handleEditButtonClick(commentElement, comment);
+   }); 
 
     return commentElement;
 }
@@ -164,15 +216,126 @@ function answerComment(comments) {
   commentsHtml.forEach((el, index) => {
     el.addEventListener("click", () => {
     // Проверяем, что клик произошел не на кнопке лайка
-    if (!event.target.classList.contains("like-button")) { 
+    if (!event.target.classList.contains("like-button") && !event.target.classList.contains("edit-button")) { 
       // Получаем выбранный комментарий из массива
-    const selectedComment = comments[index]
+      const selectedComment = comments[index];
+    
+      // Заполняем текстовое поле формы текстом выбранного комментария
+      formTextHtml.value = `Ответ на: ${selectedComment.text}`;
+      }
+    });
+  });
+}
 
-    // Заполняем текстовое поле формы текстом выбранного комментария
-    formTextHtml.value = `Ответ на: ${selectedComment.text}`;
+// Обработчик события на кнопку "Удалить"
+function deleteComment(comments) {
+  const deleteButtons = document.querySelectorAll('.delete-button');
+ 
+  deleteButtons.forEach((deleteButton) => {
+    deleteButton.addEventListener('click', async () => {
+      // Получаем id комментария из атрибута data-id
+      const commentId = deleteButton.dataset.id;
+
+      try {
+        // Вызываем функцию для удаления комментария с сервера
+        await deleteCommentFromServer(commentId);
+      
+      // Получаем индекс комментария из атрибута data-index
+      const index = parseInt(deleteButton.dataset.index);
+      // Удаляем комментарий из массива comments по индексу
+      comments.splice(index, 1);
+
+      // После удаления комментария из массива, обновляем отображение комментариев
+      renderComments(comments);
+    } catch (error) {
+      console.error('Ошибка при удалении комментария:', error);
+      // Обработка ошибок, если необходимо
     }
     });
   });
+}
+
+function removeButtons(buttons) {
+  buttons.forEach(button => {
+    button.parentNode.removeChild(button);
+  });
+}
+
+// Обработчик события клика на кнопку "Редактировать" комментария
+function handleEditButtonClick(event, comments) {
+  const commentElement = event.target.closest('.comment');
+  const commentTextElement = commentElement.querySelector('.comment-text');
+  const commentText = commentTextElement.textContent;
+
+  // Создаем поле ввода типа textarea
+  const textarea = document.createElement('textarea');
+  textarea.value = commentText;
+
+  commentElement.querySelector('.comment-body').replaceChild(textarea, commentTextElement);
+
+  // Создаем кнопку "Сохранить"
+  const saveButton = document.createElement('button');
+  saveButton.textContent = 'Сохранить';
+  saveButton.classList.add('save-button');
+
+  // Создаем кнопку "Отмена" для возможности отмены редактирования
+  const cancelButton = document.createElement('button');
+  cancelButton.textContent = 'Отмена';
+  cancelButton.classList.add('cancel-button');
+
+  // Скрываем кнопку "Редактировать"
+  event.target.style.display = 'none';
+
+  // Вставляем кнопки "Сохранить" и "Отмена" после кнопки "Редактировать"
+  const editButton = event.target;
+  editButton.parentNode.insertBefore(saveButton, editButton.nextSibling);
+  editButton.parentNode.insertBefore(cancelButton, editButton.nextSibling);
+
+  // Добавляем обработчики событий на кнопки "Сохранить" и "Отмена"
+  saveButton.addEventListener('click', () => {
+    handleSaveButtonClick(textarea.value, comments);
+  });
+
+  cancelButton.addEventListener('click', () => {
+    // Возвращаем текст комментария в DOM без сохранения изменений
+    commentTextElement.textContent = commentText;
+
+    // Возвращаем интерфейс в исходное состояние
+    commentElement.querySelector('.comment-body').replaceChild(commentTextElement, textarea);
+
+    // Удаляем кнопки "Сохранить" и "Отмена"
+    removeButtons([saveButton, cancelButton]);
+
+    // Показываем кнопку "Редактировать"
+    editButton.style.display = '';
+  });
+}
+
+function handleSaveButtonClick(newText, commentText, comments) {
+  // Обновляем текст комментария в массиве данных
+  // Находим комментарий в массиве comments, который соответствует oldText
+  const comment = comments.find(comment => comment.text === commentText);
+  if (comment) {
+      comment.text = newText;
+  } else {
+      console.error('Комментарий не найден в массиве данных');
+      return;
+  }
+
+  // Обновляем текст комментария в DOM
+  commentTextElement.textContent = newText;
+
+  // Возвращаем интерфейс в исходное состояние
+  commentElement.querySelector('.comment-body').replaceChild(commentTextElement, textarea);
+
+  // Удаляем кнопку "Сохранить"
+  saveButton.parentNode.removeChild(saveButton);
+
+  // Показываем кнопку "Редактировать"
+  editButton.style.display = '';
+
+  // Обновляем список комментариев
+  renderComments(comments);
 }
 
 function updateLikesState(likeButton, comments) {

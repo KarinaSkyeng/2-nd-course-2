@@ -58,3 +58,24 @@ export function postTodo(newComment) {
         throw error; 
     });
 }
+
+export async function deleteCommentFromServer(commentId) {
+    try {
+        const response = await fetch(`https://wedev-api.sky.pro/api/v2/karina-korneva/comments/${commentId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}` 
+           },
+        });
+        if (response.ok) {
+            console.log('Комментарий успешно удален с сервера');
+            // Здесь можно выполнить какие-либо дополнительные действия, например, обновить интерфейс
+        } else {
+            console.error('Ошибка при удалении комментария с сервера:', response.status);
+            // Обработка ошибок, если необходимо
+        }
+    } catch (error) {
+        console.error('Ошибка при выполнении запроса на удаление комментария:', error);
+        // Обработка ошибок, если необходимо
+    }
+}

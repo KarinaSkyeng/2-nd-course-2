@@ -5,10 +5,7 @@ import { renderComments } from "./render.js";
 const loadingMessage = `<div id="loading-message" style="display: none;">Пожалуйста подождите, загружаю комментарии...</div>
 `;
 document.addEventListener("DOMContentLoaded", () => {
-    //const app = document.getElementById('app')
-
-    //app.innerHTML = loadingMessage
-   
+      
       loadCommentsFromAPI();
 });
 
