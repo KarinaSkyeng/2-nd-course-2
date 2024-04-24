@@ -51,22 +51,31 @@ export function clearUser() {
     localStorage.removeItem("data");
 }
 
-// auth.js
+const userData = {
+    name: 'Ваше имя',
+    login: 'Ваш логин',
+    password: 'Ваш пароль'
+};
+
 
 export async function registerUser(userData) {
     try {
         const response = await fetch('https://wedev-api.sky.pro/api/user', {
-            method: 'POST',
-            body: userData
+            method: 'POST',            
+            body: JSON.stringify(userData)
         });
         
-        if (response.ok) {
-            // Обработка успешной регистрации
+        if (response.status === 201) {
+            const responseData = await response.json();
+            console.log('Пользователь успешно зарегистрирован:', responseData.user);
+            // Здесь вы можете выполнить дополнительные действия после успешной регистрации
+        } else if (response.status === 400) {
+            throw new Error('Пользователь с таким логином уже существует.');
         } else {
             throw new Error('Произошла ошибка при регистрации.');
         }
     } catch (error) {
-        console.error('Ошибка регистрации:', error);
+        console.error('Ошибка регистрации:', error.message);
         throw error;
     }
 }

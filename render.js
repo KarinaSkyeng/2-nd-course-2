@@ -156,7 +156,7 @@ export function renderRegistrationForm() {
 const app = document.getElementById('app')
 
   const registrationHTML = `
-  <div class="login-form">
+  <div class="registration-form">
       <h2>Форма Регистрации</h2>
       <input class="login-input-pass" type="text" id="name" placeholder="Введите имя">
       <input class="login-input-pass" type="text" id="login" placeholder="Введите логин">
