@@ -1,6 +1,8 @@
+// Функция для обработки отправки формы регистрации
 export async function handleRegistrationFormSubmit(event) {
     try {
         event.preventDefault(); // Предотвращаем отправку формы по умолчанию
+        event.stopPropagation(); // Останавливаем дальнейшее распространение события
 
         // Получаем данные из полей формы
         const name = document.getElementById('name').value;
@@ -17,9 +19,15 @@ export async function handleRegistrationFormSubmit(event) {
         // Вызываем функцию регистрации пользователя
         await registerUser(userData);
         console.log('Регистрация прошла успешно!');
-        // Здесь вы можете выполнить дополнительные действия после успешной регистрации
+
+        // Дополнительные действия после успешной регистрации (например, переход на страницу авторизации)
+        renderLoginForm(); // Пример перехода на форму авторизации после успешной регистрации
+ 
+        return false;
     } catch (error) {
         console.error('Ошибка при регистрации:', error.message);
-        // Здесь вы можете обработать ошибку регистрации
+        // Обработка ошибки регистрации (например, вывод сообщения об ошибке пользователю)
+        // alert('Ошибка при регистрации: ' + error.message);
     }
 }
+

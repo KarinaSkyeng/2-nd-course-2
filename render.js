@@ -4,6 +4,7 @@ import { nameElement, textElement } from "./main.js";
 import { login, handleSuccessfulLogin, registerUser, handleSuccessfulRegistration } from "./auth.js";
 import { addComment } from "./comments.js";
 import { getTodos, token, deleteCommentFromServer } from "./api.js"
+import { handleRegistrationFormSubmit } from "./registration.js"
 
 let commentsList;
 let isAuthenticated = false;
@@ -168,9 +169,13 @@ const app = document.getElementById('app')
 
   app.innerHTML = registrationHTML;
 
-  // Добавляем обработчик события на кнопку "Зарегистроваться"
-  const registrationButton = document.getElementById('registration-button');
-  registrationButton.addEventListener('click', registerUser);
+   // Добавляем обработчик события на кнопку "Зарегистроваться"
+   const registrationButton = document.getElementById('registration-button');
+   registrationButton.addEventListener('click', handleRegistrationFormSubmit);
+
+   // Добавляем обработчик события на ссылку "Войти"
+   const loginLink = document.getElementById('login-link');
+   loginLink.addEventListener('click', renderLoginForm);
 }
 
 function createCommentElement(name, text, formattedDate, likes, liked, index, comment) {  
