@@ -69,10 +69,10 @@ ${token ? addFormHTML : ` <div class="add-authorization" id="auth-message">Чт�
     deleteComment(comments);
 
     // Добавляем обработчик события клика на кнопку "Редактировать" для каждого комментария
-const editButtons = document.querySelectorAll('.edit-button');
+/*const editButtons = document.querySelectorAll('.edit-button');
 editButtons.forEach(button => {
   button.addEventListener('click', handleEditButtonClick);
-});
+});*/
 
 }
 
@@ -101,14 +101,21 @@ function renderButtonAuth() {
 
 // Функция для отображения формы авторизации
 export function renderLoginForm() {
+  let isLoginMode = false;
+
   const app = document.getElementById('app')
 
   const loginHTML = `
-  <div class="login-form">
+  <div class="form">
+    <h3 class="form-title">Форма ${isLoginMode ? "входа" : "регистрации"}</h3>
       <input class="login-input-pass" type="text" id="username" placeholder="Логин">
       <input class="login-input-pass" type="password" id="password-login" placeholder="Пароль">
-      <button class="button-login" id="login-button">Войти</button>
-      <span id="add-registration" class="registration-link">Зарегистрируйтесь</span>
+      <button class="button-login" id="login-button">${
+        isLoginMode ? "Войти" : "Зарегистрироваться"
+      }</button>
+      <span id="add-registration" class="registration-link">Перейти ${
+        isLoginMode ? "к регистрации" : "ко входу"
+      }</span>
   </div>  
   `;
 
@@ -153,30 +160,6 @@ registrationLink.addEventListener('click', () => {
 
 }  
 
-export function renderRegistrationForm() {
-const app = document.getElementById('app')
-
-  const registrationHTML = `
-  <div class="registration-form">
-      <h2>Форма Регистрации</h2>
-      <input class="login-input-pass" type="text" id="name" placeholder="Введите имя">
-      <input class="login-input-pass" type="text" id="login" placeholder="Введите логин">
-      <input class="login-input-pass" type="password" id="password" placeholder="Введите пароль">
-      <button class="button-login" id="registration-button">Зарегистроваться</button>
-      <span id="auth-message" class="registration-link">Войти</span>
-  </div>  
-  `;
-
-  app.innerHTML = registrationHTML;
-
-   // Добавляем обработчик события на кнопку "Зарегистроваться"
-   const registrationButton = document.getElementById('registration-button');
-   registrationButton.addEventListener('click', handleRegistrationFormSubmit);
-
-   // Добавляем обработчик события на ссылку "Войти"
-   const loginLink = document.getElementById('login-link');
-   loginLink.addEventListener('click', renderLoginForm);
-}
 
 function createCommentElement(name, text, formattedDate, likes, liked, index, comment) {  
     const commentElement = document.createElement("li");
@@ -188,7 +171,7 @@ function createCommentElement(name, text, formattedDate, likes, liked, index, co
         <div>${formattedDate}</div>
       </div>
       <div class="comment-body">
-        <div class="comment-text">${sanitizeHtml(text)}</div>
+        ${isEdit?"<textarea/>" : `<div class="comment-text">${sanitizeHtml(text)}</div>`}
       </div>
       <div class="comment-footer">
         <div class="likes">
@@ -207,7 +190,7 @@ function createCommentElement(name, text, formattedDate, likes, liked, index, co
 
    // Добавляем обработчик события клика на кнопку "Редактировать"
    editButton.addEventListener('click', () => {
-       handleEditButtonClick(commentElement, comment);
+       handleEditButtonClick(comment);
    }); 
 
     return commentElement;
@@ -240,18 +223,15 @@ function deleteComment(comments) {
     deleteButton.addEventListener('click', async () => {
       // Получаем id комментария из атрибута data-id
       const commentId = deleteButton.dataset.id;
-
+      console.log(commentId)
       try {
         // Вызываем функцию для удаления комментария с сервера
         await deleteCommentFromServer(commentId);
       
-      // Получаем индекс комментария из атрибута data-index
-      const index = parseInt(deleteButton.dataset.index);
-      // Удаляем комментарий из массива comments по индексу
-      comments.splice(index, 1);
+     const dataComments = await getTodos();
 
       // После удаления комментария из массива, обновляем отображение комментариев
-      renderComments(comments);
+      renderComments(dataComments.comments);
     } catch (error) {
       console.error('Ошибка при удалении комментария:', error);
       // Обработка ошибок, если необходимо
@@ -266,8 +246,10 @@ function removeButtons(buttons) {
   });
 }
 
+
 // Обработчик события клика на кнопку "Редактировать" комментария
-function handleEditButtonClick(event, comments) {
+function handleEditButtonClick(comments) {
+  console.log(comments)
   const commentElement = event.target.closest('.comment');
   const commentTextElement = commentElement.querySelector('.comment-text');
   const commentText = commentTextElement.textContent;

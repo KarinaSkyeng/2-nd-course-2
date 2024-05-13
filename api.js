@@ -69,6 +69,8 @@ export async function deleteCommentFromServer(commentId) {
         });
         if (response.ok) {
             console.log('Комментарий успешно удален с сервера');
+
+            return response;
             // Здесь можно выполнить какие-либо дополнительные действия, например, обновить интерфейс
         } else {
             console.error('Ошибка при удалении комментария с сервера:', response.status);
